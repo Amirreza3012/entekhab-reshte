@@ -63,14 +63,17 @@ const majors: MajorSeed[] = [
 ];
 
 async function main() {
-  const passwordHash = await bcrypt.hash("Passw0rd!", 10);
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "Passw0rd!";
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
+  const demoPasswordHash = await bcrypt.hash("Passw0rd!", 10);
 
   const admin = await prisma.user.upsert({
-    where: { email: "admin@example.com" },
+    where: { email: adminEmail },
     update: {},
     create: {
-      email: "admin@example.com",
-      passwordHash,
+      email: adminEmail,
+      passwordHash: adminPasswordHash,
       name: "مدیر سامانه",
       role: Role.ADMIN,
     },
@@ -81,7 +84,7 @@ async function main() {
     update: {},
     create: {
       email: "mentor@example.com",
-      passwordHash,
+      passwordHash: demoPasswordHash,
       name: "منتور نمونه",
       role: Role.MENTOR,
     },
@@ -92,7 +95,7 @@ async function main() {
     update: {},
     create: {
       email: "student@example.com",
-      passwordHash,
+      passwordHash: demoPasswordHash,
       name: "دانش‌آموز نمونه",
       role: Role.STUDENT,
       mentorId: mentor.id,
@@ -108,9 +111,9 @@ async function main() {
   }
 
   console.log("Seed completed.");
-  console.log(`Admin: admin@example.com / Passw0rd!`);
-  console.log(`Mentor: mentor@example.com / Passw0rd!`);
-  console.log(`Student: student@example.com / Passw0rd!`);
+  console.log(`Admin: ${adminEmail} / ${adminPassword}`);
+  console.log(`Mentor (demo): mentor@example.com / Passw0rd!`);
+  console.log(`Student (demo): student@example.com / Passw0rd!`);
   console.log(`Created admin id: ${admin.id}`);
 }
 
