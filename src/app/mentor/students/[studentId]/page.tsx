@@ -9,12 +9,14 @@ import { Pagination } from "@/components/Pagination";
 import { MentorAddChoiceButton } from "@/components/MentorAddChoiceButton";
 import { RemoveChoiceInlineButton } from "@/components/RemoveChoiceInlineButton";
 import { ChoiceList } from "@/components/ChoiceList";
+import { MentorLogItem } from "@/components/MentorLogItem";
+import { NotebookPen } from "lucide-react";
 import {
   moveChoiceForStudentAction,
   removeChoiceForStudentAction,
   addMentorNoteAction,
 } from "@/app/mentor/actions";
-import { MENTOR_ACTION_LABELS, toPersianDigits } from "@/lib/format";
+import { toPersianDigits } from "@/lib/format";
 
 type SearchParams = {
   q?: string;
@@ -148,8 +150,9 @@ export default async function MentorStudentPage({
           />
           <button
             type="submit"
-            className="self-start rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            className="flex items-center gap-1.5 self-start rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
           >
+            <NotebookPen className="h-4 w-4" />
             ثبت یادداشت
           </button>
         </form>
@@ -159,20 +162,7 @@ export default async function MentorStudentPage({
             <p className="text-sm text-slate-500">هنوز فعالیتی ثبت نشده است.</p>
           ) : (
             logs.map((log) => (
-              <div
-                key={log.id}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm"
-              >
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="font-medium text-slate-800">
-                    {MENTOR_ACTION_LABELS[log.action]}
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    {new Date(log.createdAt).toLocaleString("fa-IR")}
-                  </span>
-                </div>
-                <p className="text-slate-600">{log.detail}</p>
-              </div>
+              <MentorLogItem key={log.id} log={log} studentId={studentId} />
             ))
           )}
         </div>

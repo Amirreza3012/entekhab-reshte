@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClipboardList } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { Role } from "@/generated/prisma/client";
 import { getMajorFilterOptions, searchMajors } from "@/lib/majors";
@@ -63,8 +64,9 @@ export default async function StudentSearchPage({
         <h1 className="text-lg font-bold text-slate-900">جستجوی رشته‌ها</h1>
         <Link
           href="/student/choices"
-          className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+          className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
         >
+          <ClipboardList className="h-4 w-4" />
           انتخاب‌های من ({toPersianDigits(currentChoices.length)}/{toPersianDigits(MAX_CHOICES)})
         </Link>
       </div>

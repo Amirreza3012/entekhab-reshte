@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { UserPlus } from "lucide-react";
 import { createUserAction, type ActionResult } from "@/app/admin/actions";
 
 const initialState: ActionResult = {};
@@ -17,15 +18,22 @@ export function CreateUserForm() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("STUDENT");
 
-  useEffect(() => {
-    if (state.error) toast.error(state.error);
+  // Reset fields on a successful submission (but not on error) using React's
+  // "adjust state during render" pattern, so it doesn't need an effect.
+  const [lastHandledState, setLastHandledState] = useState(state);
+  if (state !== lastHandledState) {
+    setLastHandledState(state);
     if (state.success) {
-      toast.success(state.success);
       setName("");
       setEmail("");
       setPassword("");
       setRole("STUDENT");
     }
+  }
+
+  useEffect(() => {
+    if (state.error) toast.error(state.error);
+    if (state.success) toast.success(state.success);
   }, [state]);
 
   return (
@@ -73,8 +81,9 @@ export function CreateUserForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60 lg:col-span-4"
+        className="flex items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60 lg:col-span-4"
       >
+        <UserPlus className="h-4 w-4" />
         {pending ? "در حال ایجاد..." : "ایجاد کاربر"}
       </button>
     </form>

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Save } from "lucide-react";
 import { updateUserAction, type ActionResult } from "@/app/admin/actions";
 
 const initialState: ActionResult = {};
@@ -27,12 +28,17 @@ export function EditUserForm({
   const [role, setRole] = useState(defaultRole);
   const [password, setPassword] = useState("");
 
+  // Clear the password field on a successful save, using React's "adjust
+  // state during render" pattern instead of setState inside an effect.
+  const [lastHandledState, setLastHandledState] = useState(state);
+  if (state !== lastHandledState) {
+    setLastHandledState(state);
+    if (state.success) setPassword("");
+  }
+
   useEffect(() => {
     if (state.error) toast.error(state.error);
-    if (state.success) {
-      toast.success(state.success);
-      setPassword("");
-    }
+    if (state.success) toast.success(state.success);
   }, [state]);
 
   return (
@@ -102,8 +108,9 @@ export function EditUserForm({
       <button
         type="submit"
         disabled={pending}
-        className="self-start rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60"
+        className="flex items-center gap-1.5 self-start rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60"
       >
+        <Save className="h-4 w-4" />
         {pending ? "در حال ذخیره..." : "ذخیره تغییرات"}
       </button>
     </form>

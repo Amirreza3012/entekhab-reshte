@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Pencil } from "lucide-react";
 import { getStudents, getMentors } from "@/lib/admin";
 import { CreateUserForm } from "@/components/CreateUserForm";
 import { MentorAssignSelect } from "@/components/MentorAssignSelect";
@@ -60,8 +61,9 @@ export default async function AdminUsersPage() {
                       <div className="flex items-center gap-1.5">
                         <Link
                           href={`/admin/users/${student.id}`}
-                          className="rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
+                          className="flex items-center gap-1 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
                         >
+                          <Pencil className="h-3.5 w-3.5" />
                           ویرایش
                         </Link>
                         <DeleteUserButton
@@ -111,8 +113,9 @@ export default async function AdminUsersPage() {
                       <div className="flex items-center gap-1.5">
                         <Link
                           href={`/admin/users/${mentor.id}`}
-                          className="rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
+                          className="flex items-center gap-1 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
                         >
+                          <Pencil className="h-3.5 w-3.5" />
                           ویرایش
                         </Link>
                         <DeleteUserButton

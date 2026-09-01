@@ -1,3 +1,4 @@
+import { ChevronUp, ChevronDown, Trash2 } from "lucide-react";
 import type { Choice, Major } from "@/generated/prisma/client";
 import { toPersianDigits } from "@/lib/format";
 
@@ -73,10 +74,10 @@ export function ChoiceList({
                       <button
                         type="submit"
                         disabled={index === 0}
-                        className="rounded-lg border border-slate-300 px-2 py-1 text-xs hover:bg-slate-50 disabled:opacity-30"
+                        className="rounded-lg border border-slate-300 p-1 text-xs hover:bg-slate-50 disabled:opacity-30"
                         title="بالا"
                       >
-                        ▲
+                        <ChevronUp className="h-3.5 w-3.5" />
                       </button>
                     </form>
                     <form action={moveAction}>
@@ -86,10 +87,10 @@ export function ChoiceList({
                       <button
                         type="submit"
                         disabled={index === choices.length - 1}
-                        className="rounded-lg border border-slate-300 px-2 py-1 text-xs hover:bg-slate-50 disabled:opacity-30"
+                        className="rounded-lg border border-slate-300 p-1 text-xs hover:bg-slate-50 disabled:opacity-30"
                         title="پایین"
                       >
-                        ▼
+                        <ChevronDown className="h-3.5 w-3.5" />
                       </button>
                     </form>
                     <form action={removeAction}>
@@ -97,9 +98,10 @@ export function ChoiceList({
                       <input type="hidden" name="choiceId" value={choice.id} />
                       <button
                         type="submit"
-                        className="rounded-lg border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                        className="rounded-lg border border-red-200 p-1 text-xs text-red-600 hover:bg-red-50"
+                        title="حذف"
                       >
-                        حذف
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </form>
                   </div>

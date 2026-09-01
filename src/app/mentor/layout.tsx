@@ -1,3 +1,4 @@
+import { Users } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { Role } from "@/generated/prisma/client";
 import { AppHeader } from "@/components/AppHeader";
@@ -14,7 +15,13 @@ export default async function MentorLayout({
       <AppHeader
         title="پنل منتور"
         userName={user.name ?? ""}
-        links={[{ href: "/mentor", label: "دانش‌آموزان من" }]}
+        links={[
+          {
+            href: "/mentor",
+            label: "دانش‌آموزان من",
+            icon: <Users className="h-4 w-4" />,
+          },
+        ]}
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         {children}

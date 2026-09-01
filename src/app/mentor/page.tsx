@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Eye } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { Role } from "@/generated/prisma/client";
 import { getMentees } from "@/lib/mentor";
@@ -51,8 +52,9 @@ export default async function MentorHomePage() {
                   <td className="px-3 py-3">
                     <Link
                       href={`/mentor/students/${student.id}`}
-                      className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
+                      className="flex w-fit items-center gap-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
                     >
+                      <Eye className="h-3.5 w-3.5" />
                       مشاهده و ویرایش
                     </Link>
                   </td>

@@ -1,3 +1,5 @@
+import { Filter } from "lucide-react";
+
 type Options = {
   fieldGroups: string[];
   provinces: string[];
@@ -84,8 +86,9 @@ export function MajorFilters({
 
       <button
         type="submit"
-        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+        className="flex items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
       >
+        <Filter className="h-4 w-4" />
         اعمال فیلتر
       </button>
     </form>

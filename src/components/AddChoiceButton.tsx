@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 import { addChoiceAction, type ActionResult } from "@/app/student/actions";
 
 const initialState: ActionResult = {};
@@ -38,8 +39,9 @@ export function AddChoiceButton({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
+        className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
       >
+        <Plus className="h-3.5 w-3.5" />
         {pending ? "..." : "افزودن به انتخاب‌ها"}
       </button>
     </form>

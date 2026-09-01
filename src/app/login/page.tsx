@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState } from "react";
+import { LogIn } from "lucide-react";
 import { loginAction, type LoginState } from "./actions";
 
 const initialState: LoginState = {};
@@ -14,6 +16,15 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="mb-3 flex justify-center">
+          <Image
+            src="/logo.svg"
+            alt="لوگو"
+            width={64}
+            height={64}
+            className="rounded-2xl"
+          />
+        </div>
         <h1 className="mb-1 text-center text-xl font-bold text-slate-900">
           سامانه انتخاب رشته
         </h1>
@@ -62,8 +73,9 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60"
+            className="mt-2 flex items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60"
           >
+            <LogIn className="h-4 w-4" />
             {pending ? "در حال ورود..." : "ورود"}
           </button>
         </form>

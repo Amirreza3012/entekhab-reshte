@@ -5,7 +5,7 @@ import { requireRole } from "@/lib/session";
 import { addChoice, moveChoice, removeChoice, ChoiceError } from "@/lib/choices";
 import { getMenteeOrThrow } from "@/lib/mentor";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/generated/prisma/client";
+import { Role, MentorAction } from "@/generated/prisma/client";
 
 export type ActionResult = { error?: string };
 
@@ -64,6 +64,36 @@ export async function addMentorNoteAction(formData: FormData) {
       action: "NOTE",
       detail: note,
     },
+  });
+
+  revalidatePath(`/mentor/students/${studentId}`);
+}
+
+export async function updateMentorNoteAction(formData: FormData) {
+  const mentor = await requireRole(Role.MENTOR);
+  const logId = String(formData.get("logId") ?? "");
+  const studentId = String(formData.get("studentId") ?? "");
+  const detail = String(formData.get("detail") ?? "").trim();
+
+  if (!detail) return;
+
+  const log = await prisma.mentorLog.findFirst({
+    where: { id: logId, mentorId: mentor.id, studentId, action: MentorAction.NOTE },
+  });
+  if (!log) return;
+
+  await prisma.mentorLog.update({ where: { id: logId }, data: { detail } });
+
+  revalidatePath(`/mentor/students/${studentId}`);
+}
+
+export async function deleteMentorNoteAction(formData: FormData) {
+  const mentor = await requireRole(Role.MENTOR);
+  const logId = String(formData.get("logId") ?? "");
+  const studentId = String(formData.get("studentId") ?? "");
+
+  await prisma.mentorLog.deleteMany({
+    where: { id: logId, mentorId: mentor.id, studentId, action: MentorAction.NOTE },
   });
 
   revalidatePath(`/mentor/students/${studentId}`);

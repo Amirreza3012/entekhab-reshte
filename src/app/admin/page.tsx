@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getOverviewStats, getMentors } from "@/lib/admin";
 import { toPersianDigits } from "@/lib/format";
 
@@ -36,9 +37,10 @@ export default async function AdminHomePage() {
           <h2 className="font-semibold text-slate-800">فعالیت منتورها</h2>
           <Link
             href="/admin/users"
-            className="text-sm text-slate-600 hover:text-slate-900"
+            className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900"
           >
-            مدیریت کاربران →
+            مدیریت کاربران
+            <ArrowLeft className="h-3.5 w-3.5" />
           </Link>
         </div>
 
