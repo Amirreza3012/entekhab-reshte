@@ -3,6 +3,7 @@ import { ROLE_HOME } from "@/lib/roles";
 import type { Role } from "@/generated/prisma/client";
 
 export const authConfig = {
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
