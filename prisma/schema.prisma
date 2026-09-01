@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MENTOR
+  STUDENT
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  BOTH
+}
+
+enum TermType {
+  FIRST_TERM
+  SECOND_TERM
+  UNSPECIFIED
+}
+
+enum MentorAction {
+  ADD_CHOICE
+  REMOVE_CHOICE
+  REORDER_CHOICE
+  NOTE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role
+  nationalId   String?
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Self-relation: a STUDENT is assigned to at most one MENTOR
+  mentorId String?
+  mentor   User?   @relation("MentorStudents", fields: [mentorId], references: [id])
+  mentees  User[]  @relation("MentorStudents")
+
+  choices           Choice[]
+  mentorLogsAsMentor  MentorLog[] @relation("MentorLogsAsMentor")
+  mentorLogsAsStudent MentorLog[] @relation("MentorLogsAsStudent")
+
+  @@index([role])
+  @@index([mentorId])
+}
+
+model Major {
+  id          String    @id @default(cuid())
+  examYear    Int       @default(1404)
+  fieldGroup  String
+  province    String
+  university  String
+  studyPeriod String
+  majorCode   String
+  title       String
+  capacity    Int?
+  termType    TermType  @default(UNSPECIFIED)
+  gender      Gender    @default(BOTH)
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  choices Choice[]
+
+  @@unique([examYear, majorCode])
+  @@index([fieldGroup])
+  @@index([province])
+  @@index([university])
+  @@index([studyPeriod])
+  @@index([gender])
+  @@index([title])
+}
+
+model Choice {
+  id        String   @id @default(cuid())
+  rank      Int
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  majorId   String
+  major     Major    @relation(fields: [majorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, rank])
+  @@unique([studentId, majorId])
+  @@index([majorId])
+}
+
+model MentorLog {
+  id        String       @id @default(cuid())
+  mentorId  String
+  mentor    User         @relation("MentorLogsAsMentor", fields: [mentorId], references: [id], onDelete: Cascade)
+  studentId String
+  student   User         @relation("MentorLogsAsStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  action    MentorAction
+  detail    String
+  createdAt DateTime     @default(now())
+
+  @@index([mentorId])
+  @@index([studentId])
+}
