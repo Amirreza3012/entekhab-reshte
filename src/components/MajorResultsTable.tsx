@@ -27,7 +27,7 @@ export function MajorResultsTable({
             <th className="px-3 py-2 font-medium">دوره تحصیلی</th>
             <th className="px-3 py-2 font-medium">کدرشته‌محل</th>
             <th className="px-3 py-2 font-medium">ظرفیت</th>
-            <th className="px-3 py-2 font-medium">جنسیت</th>
+            <th className="whitespace-nowrap px-3 py-2 font-medium">جنسیت</th>
             <th className="px-3 py-2 font-medium">توضیحات</th>
             <th className="px-3 py-2 font-medium"></th>
           </tr>
@@ -49,19 +49,21 @@ export function MajorResultsTable({
                   {TERM_LABELS[major.termType]}
                 </div>
               </td>
-              <td className="px-3 py-3 align-top text-slate-700" dir="ltr">
+              <td className="px-3 py-3 align-top text-right text-slate-700" dir="ltr">
                 {toPersianDigits(major.majorCode)}
               </td>
               <td className="px-3 py-3 align-top text-slate-700">
                 {major.capacity != null ? toPersianDigits(major.capacity) : "-"}
               </td>
-              <td className="px-3 py-3 align-top text-slate-700">
+              <td className="whitespace-nowrap px-3 py-3 align-top text-slate-700">
                 {GENDER_LABELS[major.gender]}
               </td>
               <td className="px-3 py-3 align-top text-xs text-slate-500">
                 {major.description ?? "-"}
               </td>
-              <td className="px-3 py-3 align-top">{renderAction(major)}</td>
+              <td className="whitespace-nowrap px-3 py-3 align-top">
+                {renderAction(major)}
+              </td>
             </tr>
           ))}
         </tbody>

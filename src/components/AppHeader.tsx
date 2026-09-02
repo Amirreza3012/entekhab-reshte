@@ -35,11 +35,11 @@ export function AppHeader({
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="لوگو"
-              width={28}
+              width={42}
               height={28}
-              className="rounded-lg"
+              className="object-contain"
             />
             <span className="text-base font-bold text-slate-900">
               {title}

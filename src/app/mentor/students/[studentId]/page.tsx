@@ -1,5 +1,7 @@
+import Link from "next/link";
+import { ExternalLink, NotebookPen } from "lucide-react";
 import { requireRole } from "@/lib/session";
-import { Role } from "@/generated/prisma/client";
+import { Role, MentorAction } from "@/generated/prisma/client";
 import { getMenteeOrThrow, getMentorLogsForStudent } from "@/lib/mentor";
 import { getMajorFilterOptions, searchMajors } from "@/lib/majors";
 import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
@@ -10,13 +12,15 @@ import { MentorAddChoiceButton } from "@/components/MentorAddChoiceButton";
 import { RemoveChoiceInlineButton } from "@/components/RemoveChoiceInlineButton";
 import { ChoiceList } from "@/components/ChoiceList";
 import { MentorLogItem } from "@/components/MentorLogItem";
-import { NotebookPen } from "lucide-react";
+import { PdfExportButton } from "@/components/PdfExportButton";
 import {
   moveChoiceForStudentAction,
   removeChoiceForStudentAction,
   addMentorNoteAction,
 } from "@/app/mentor/actions";
 import { toPersianDigits } from "@/lib/format";
+
+const CHOICES_PAGE_SIZE = 10;
 
 type SearchParams = {
   q?: string;
@@ -25,6 +29,7 @@ type SearchParams = {
   studyPeriod?: string;
   gender?: string;
   page?: string;
+  choicesPage?: string;
 };
 
 export default async function MentorStudentPage({
@@ -54,8 +59,21 @@ export default async function MentorStudentPage({
     getMentorLogsForStudent(mentor.id, studentId),
   ]);
 
+  const notes = logs.filter((log) => log.action === MentorAction.NOTE);
+  const historyLogs = logs.filter((log) => log.action !== MentorAction.NOTE);
+
   const choiceIdByMajorId = new Map(choices.map((c) => [c.majorId, c.id]));
   const atLimit = choices.length >= MAX_CHOICES;
+
+  const choicesPage = Math.max(1, Number(sp.choicesPage ?? 1));
+  const choicesPageCount = Math.max(
+    1,
+    Math.ceil(choices.length / CHOICES_PAGE_SIZE)
+  );
+  const pagedChoices = choices.slice(
+    (choicesPage - 1) * CHOICES_PAGE_SIZE,
+    choicesPage * CHOICES_PAGE_SIZE
+  );
 
   const buildHref = (page: number) => {
     const p = new URLSearchParams();
@@ -65,6 +83,18 @@ export default async function MentorStudentPage({
     if (sp.studyPeriod) p.set("studyPeriod", sp.studyPeriod);
     if (sp.gender) p.set("gender", sp.gender);
     p.set("page", String(page));
+    return `/mentor/students/${studentId}?${p.toString()}`;
+  };
+
+  const buildChoicesHref = (page: number) => {
+    const p = new URLSearchParams();
+    if (sp.q) p.set("q", sp.q);
+    if (sp.fieldGroup) p.set("fieldGroup", sp.fieldGroup);
+    if (sp.province) p.set("province", sp.province);
+    if (sp.studyPeriod) p.set("studyPeriod", sp.studyPeriod);
+    if (sp.gender) p.set("gender", sp.gender);
+    if (sp.page) p.set("page", sp.page);
+    p.set("choicesPage", String(page));
     return `/mentor/students/${studentId}?${p.toString()}`;
   };
 
@@ -78,17 +108,38 @@ export default async function MentorStudentPage({
       </div>
 
       <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold text-slate-800">
             انتخاب‌های دانش‌آموز ({toPersianDigits(choices.length)}/
             {toPersianDigits(MAX_CHOICES)})
           </h2>
+          <div className="flex items-center gap-2">
+            <PdfExportButton
+              studentName={student.name}
+              choices={choices}
+              fileName={`انتخاب-های-${student.name}.pdf`}
+            />
+            <Link
+              href={`/mentor/students/${studentId}/choices`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              <ExternalLink className="h-4 w-4" />
+              مشاهده کامل
+            </Link>
+          </div>
         </div>
         <ChoiceList
-          choices={choices}
+          choices={pagedChoices}
           moveAction={moveChoiceForStudentAction}
           removeAction={removeChoiceForStudentAction}
           extraHiddenFields={{ studentId }}
+        />
+        <Pagination
+          page={choicesPage}
+          pageCount={choicesPageCount}
+          buildHref={buildChoicesHref}
         />
       </section>
 
@@ -138,7 +189,7 @@ export default async function MentorStudentPage({
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="font-semibold text-slate-800">یادداشت و تاریخچه منتورینگ</h2>
+        <h2 className="font-semibold text-slate-800">یادداشت‌ها</h2>
         <form action={addMentorNoteAction} className="flex flex-col gap-2">
           <input type="hidden" name="studentId" value={studentId} />
           <textarea
@@ -158,10 +209,23 @@ export default async function MentorStudentPage({
         </form>
 
         <div className="flex flex-col gap-2">
-          {logs.length === 0 ? (
-            <p className="text-sm text-slate-500">هنوز فعالیتی ثبت نشده است.</p>
+          {notes.length === 0 ? (
+            <p className="text-sm text-slate-500">هنوز یادداشتی ثبت نشده است.</p>
           ) : (
-            logs.map((log) => (
+            notes.map((log) => (
+              <MentorLogItem key={log.id} log={log} studentId={studentId} />
+            ))
+          )}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-semibold text-slate-800">تاریخچه تغییرات</h2>
+        <div className="flex flex-col gap-2">
+          {historyLogs.length === 0 ? (
+            <p className="text-sm text-slate-500">هنوز تغییری ثبت نشده است.</p>
+          ) : (
+            historyLogs.map((log) => (
               <MentorLogItem key={log.id} log={log} studentId={studentId} />
             ))
           )}

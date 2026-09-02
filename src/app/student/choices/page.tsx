@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/session";
 import { Role } from "@/generated/prisma/client";
 import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { ChoiceList } from "@/components/ChoiceList";
+import { PdfExportButton } from "@/components/PdfExportButton";
 import { moveChoiceAction, removeChoiceAction } from "@/app/student/actions";
 import { toPersianDigits } from "@/lib/format";
 
@@ -11,11 +12,18 @@ export default async function StudentChoicesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-lg font-bold text-slate-900">انتخاب‌های من</h1>
-        <span className="text-sm text-slate-500">
-          {toPersianDigits(choices.length)} از {toPersianDigits(MAX_CHOICES)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-500">
+            {toPersianDigits(choices.length)} از {toPersianDigits(MAX_CHOICES)}
+          </span>
+          <PdfExportButton
+            studentName={user.name ?? ""}
+            choices={choices}
+            fileName="انتخاب-های-من.pdf"
+          />
+        </div>
       </div>
 
       <ChoiceList

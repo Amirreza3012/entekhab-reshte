@@ -15,21 +15,22 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-50 px-4 text-center">
       <Image
-        src="/logo.svg"
+        src="/logo.png"
         alt="لوگوی سامانه انتخاب رشته"
-        width={110}
-        height={110}
-        className="rounded-3xl shadow-sm"
+        width={300}
+        height={200}
+        className="object-contain"
         priority
       />
 
       <div className="flex max-w-lg flex-col gap-2">
         <h1 className="text-2xl font-bold text-slate-900">
-          سامانه انتخاب رشته
+          سامانه انتخاب رشته دکتر ماهده خداپرست{" "}
         </h1>
         <p className="text-sm leading-7 text-slate-600">
-          این نرم‌افزار متعلق به امیررضا ابراهیمی است و به‌صورت اختصاصی برای
-          مجموعه‌ی باورنو و دکتر ماهده خداپرست طراحی و توسعه داده شده است.
+          این نرم‌افزار متعلق به <Link className="underline" href="https://t.me/Amir_13185458">امیررضا ابراهیمی</Link> است و
+          به‌صورت اختصاصی برای مجموعه‌ی باورنو و دکتر ماهده خداپرست طراحی و
+          توسعه داده شده است.
         </p>
       </div>
 

@@ -23,7 +23,7 @@ type MajorSeed = {
 // جایگزینی با فایل رسمی سازمان سنجش پس از آماده شدن importer نهایی انجام می‌شود.
 const majors: MajorSeed[] = [
   { fieldGroup: "پزشکی", province: "آذربایجان شرقی", university: "دانشگاه علوم پزشکی تبریز", studyPeriod: "روزانه", majorCode: "31801", title: "دکتری عمومی پزشکی", capacity: 110, termType: TermType.FIRST_TERM, gender: Gender.BOTH },
-  { fieldGroup: "پزشکی", province: "آذربایجان شرقی", university: "دانشگاه علوم پزشکی تبریز - شهریه‌پرداز", studyPeriod: "شهریه پردار", majorCode: "31839", title: "دکتری عمومی پزشکی", capacity: 19, termType: TermType.FIRST_TERM, gender: Gender.MALE },
+  { fieldGroup: "پزشکی", province: "آذربایجان شرقی", university: "دانشگاه علوم پزشکی تبریز - شهریه‌پرداز", studyPeriod: "شهریه‌پرداز", majorCode: "31839", title: "دکتری عمومی پزشکی", capacity: 19, termType: TermType.FIRST_TERM, gender: Gender.MALE },
   { fieldGroup: "پزشکی", province: "آذربایجان شرقی", university: "دانشگاه علوم پزشکی تبریز (محل تحصیل دانشکده علوم پزشکی مراغه)", studyPeriod: "روزانه", majorCode: "31867", title: "دکتری عمومی پزشکی", capacity: 29, termType: TermType.FIRST_TERM, gender: Gender.BOTH, description: "عدم تعهد در واگذاری خوابگاه" },
   { fieldGroup: "پزشکی", province: "آذربایجان غربی", university: "دانشگاه علوم پزشکی ارومیه", studyPeriod: "روزانه", majorCode: "31903", title: "دکتری عمومی پزشکی", capacity: 62, termType: TermType.FIRST_TERM, gender: Gender.BOTH, description: "عدم تعهد در واگذاری خوابگاه" },
   { fieldGroup: "پزشکی", province: "اردبیل", university: "دانشگاه علوم پزشکی اردبیل", studyPeriod: "روزانه", majorCode: "31967", title: "دکتری عمومی پزشکی", capacity: 48, termType: TermType.FIRST_TERM, gender: Gender.BOTH, description: "فاقد خوابگاه" },

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { LogIn } from "lucide-react";
 import { loginAction, type LoginState } from "./actions";
 
@@ -13,16 +13,19 @@ export default function LoginPage() {
     initialState
   );
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-3 flex justify-center">
           <Image
-            src="/logo.svg"
+            src="/logo.png"
             alt="لوگو"
-            width={64}
+            width={96}
             height={64}
-            className="rounded-2xl"
+            className="object-contain"
           />
         </div>
         <h1 className="mb-1 text-center text-xl font-bold text-slate-900">
@@ -42,6 +45,8 @@ export default function LoginPage() {
               name="email"
               type="email"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
               placeholder="you@example.com"
             />
@@ -59,6 +64,8 @@ export default function LoginPage() {
               name="password"
               type="password"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
               placeholder="••••••••"
             />

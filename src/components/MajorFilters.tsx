@@ -1,4 +1,5 @@
 import { Filter } from "lucide-react";
+import { SearchableSelect } from "@/components/SearchableSelect";
 
 type Options = {
   fieldGroups: string[];
@@ -35,44 +36,26 @@ export function MajorFilters({
         className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 lg:col-span-2"
       />
 
-      <select
+      <SearchableSelect
         name="fieldGroup"
-        defaultValue={defaults.fieldGroup ?? ""}
-        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
-      >
-        <option value="">همه رشته‌ها</option>
-        {options.fieldGroups.map((f) => (
-          <option key={f} value={f}>
-            {f}
-          </option>
-        ))}
-      </select>
+        options={options.fieldGroups}
+        placeholder="همه رشته‌ها"
+        defaultValue={defaults.fieldGroup}
+      />
 
-      <select
+      <SearchableSelect
         name="province"
-        defaultValue={defaults.province ?? ""}
-        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
-      >
-        <option value="">همه استان‌ها</option>
-        {options.provinces.map((p) => (
-          <option key={p} value={p}>
-            {p}
-          </option>
-        ))}
-      </select>
+        options={options.provinces}
+        placeholder="همه استان‌ها"
+        defaultValue={defaults.province}
+      />
 
-      <select
+      <SearchableSelect
         name="studyPeriod"
-        defaultValue={defaults.studyPeriod ?? ""}
-        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
-      >
-        <option value="">همه دوره‌ها</option>
-        {options.studyPeriods.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
+        options={options.studyPeriods}
+        placeholder="همه دوره‌ها"
+        defaultValue={defaults.studyPeriod}
+      />
 
       <select
         name="gender"

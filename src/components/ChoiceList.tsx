@@ -61,7 +61,7 @@ export function ChoiceList({
                   {choice.major.university}
                 </div>
               </td>
-              <td className="px-3 py-3 text-slate-700" dir="ltr">
+              <td className="px-3 py-3 text-right text-slate-700" dir="ltr">
                 {toPersianDigits(choice.major.majorCode)}
               </td>
               {!readOnly && (
