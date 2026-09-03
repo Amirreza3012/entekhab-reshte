@@ -4,9 +4,11 @@ import { getMenteeOrThrow } from "@/lib/mentor";
 import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { ChoiceList } from "@/components/ChoiceList";
 import { PdfExportButton } from "@/components/PdfExportButton";
+import { DragReorderPanel } from "@/components/DragReorderPanel";
 import {
   moveChoiceForStudentAction,
   removeChoiceForStudentAction,
+  reorderChoicesForStudentAction,
 } from "@/app/mentor/actions";
 import { toPersianDigits } from "@/lib/format";
 
@@ -39,12 +41,23 @@ export default async function MentorStudentAllChoicesPage({
         />
       </div>
 
-      <ChoiceList
-        choices={choices}
-        moveAction={moveChoiceForStudentAction}
-        removeAction={removeChoiceForStudentAction}
-        extraHiddenFields={{ studentId }}
-      />
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1">
+          <ChoiceList
+            choices={choices}
+            moveAction={moveChoiceForStudentAction}
+            removeAction={removeChoiceForStudentAction}
+            extraHiddenFields={{ studentId }}
+          />
+        </div>
+        <DragReorderPanel
+          studentId={studentId}
+          choices={choices}
+          reorderAction={reorderChoicesForStudentAction}
+          removeAction={removeChoiceForStudentAction}
+          extraHiddenFields={{ studentId }}
+        />
+      </div>
     </div>
   );
 }

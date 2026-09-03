@@ -186,4 +186,54 @@ export async function moveChoice({
   });
 }
 
+export async function reorderAllChoices({
+  studentId,
+  orderedChoiceIds,
+  actorId,
+  actorRole,
+}: {
+  studentId: string;
+  orderedChoiceIds: string[];
+  actorId: string;
+  actorRole: Role;
+}) {
+  await authorize(studentId, actorId, actorRole);
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.choice.findMany({ where: { studentId } });
+    const existingIds = new Set(existing.map((c) => c.id));
+
+    if (
+      orderedChoiceIds.length !== existing.length ||
+      !orderedChoiceIds.every((id) => existingIds.has(id))
+    ) {
+      throw new ChoiceError("لیست انتخاب‌ها با وضعیت فعلی هم‌خوانی ندارد.");
+    }
+
+    // Two-phase update: first move every row to a temporary negative rank so
+    // no intermediate write collides with the unique (studentId, rank) index.
+    await Promise.all(
+      orderedChoiceIds.map((id, index) =>
+        tx.choice.update({ where: { id }, data: { rank: -(index + 1) } })
+      )
+    );
+    await Promise.all(
+      orderedChoiceIds.map((id, index) =>
+        tx.choice.update({ where: { id }, data: { rank: index + 1 } })
+      )
+    );
+
+    if (actorRole === Role.MENTOR) {
+      await tx.mentorLog.create({
+        data: {
+          mentorId: actorId,
+          studentId,
+          action: "REORDER_CHOICE",
+          detail: "ترتیب انتخاب‌ها با کشیدن و رها کردن بازچینی شد.",
+        },
+      });
+    }
+  });
+}
+
 export { ChoiceError };

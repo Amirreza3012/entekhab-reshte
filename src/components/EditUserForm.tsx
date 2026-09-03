@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { updateUserAction, type ActionResult } from "@/app/admin/actions";
 
 const initialState: ActionResult = {};
@@ -94,9 +95,8 @@ export function EditUserForm({
           <label className="text-sm font-medium text-slate-700">
             رمز عبور جدید (اختیاری)
           </label>
-          <input
+          <PasswordInput
             name="password"
-            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="برای عدم تغییر خالی بگذارید"

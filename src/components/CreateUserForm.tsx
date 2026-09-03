@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { createUserAction, type ActionResult } from "@/app/admin/actions";
 
 const initialState: ActionResult = {};
@@ -58,9 +59,8 @@ export function CreateUserForm() {
         onChange={(e) => setEmail(e.target.value)}
         className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
       />
-      <input
+      <PasswordInput
         name="password"
-        type="password"
         placeholder="رمز عبور موقت"
         required
         value={password}

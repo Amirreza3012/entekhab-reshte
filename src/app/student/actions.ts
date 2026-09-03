@@ -2,7 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/session";
-import { addChoice, moveChoice, removeChoice, ChoiceError } from "@/lib/choices";
+import {
+  addChoice,
+  moveChoice,
+  removeChoice,
+  reorderAllChoices,
+  ChoiceError,
+} from "@/lib/choices";
 import { Role } from "@/generated/prisma/client";
 
 export type ActionResult = { error?: string };
@@ -44,4 +50,26 @@ export async function moveChoiceAction(formData: FormData) {
   await moveChoice({ choiceId, direction, actorId: user.id, actorRole: Role.STUDENT });
 
   revalidatePath("/student/choices");
+}
+
+export async function reorderChoicesAction(
+  studentId: string,
+  orderedChoiceIds: string[]
+): Promise<ActionResult> {
+  const user = await requireRole(Role.STUDENT);
+
+  try {
+    await reorderAllChoices({
+      studentId,
+      orderedChoiceIds,
+      actorId: user.id,
+      actorRole: Role.STUDENT,
+    });
+  } catch (error) {
+    if (error instanceof ChoiceError) return { error: error.message };
+    throw error;
+  }
+
+  revalidatePath("/student/choices");
+  return {};
 }

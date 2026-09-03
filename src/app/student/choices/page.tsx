@@ -3,7 +3,12 @@ import { Role } from "@/generated/prisma/client";
 import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { ChoiceList } from "@/components/ChoiceList";
 import { PdfExportButton } from "@/components/PdfExportButton";
-import { moveChoiceAction, removeChoiceAction } from "@/app/student/actions";
+import { DragReorderPanel } from "@/components/DragReorderPanel";
+import {
+  moveChoiceAction,
+  removeChoiceAction,
+  reorderChoicesAction,
+} from "@/app/student/actions";
 import { toPersianDigits } from "@/lib/format";
 
 export default async function StudentChoicesPage() {
@@ -26,11 +31,21 @@ export default async function StudentChoicesPage() {
         </div>
       </div>
 
-      <ChoiceList
-        choices={choices}
-        moveAction={moveChoiceAction}
-        removeAction={removeChoiceAction}
-      />
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1">
+          <ChoiceList
+            choices={choices}
+            moveAction={moveChoiceAction}
+            removeAction={removeChoiceAction}
+          />
+        </div>
+        <DragReorderPanel
+          studentId={user.id}
+          choices={choices}
+          reorderAction={reorderChoicesAction}
+          removeAction={removeChoiceAction}
+        />
+      </div>
     </div>
   );
 }

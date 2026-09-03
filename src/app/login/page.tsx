@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useActionState, useState } from "react";
 import { LogIn } from "lucide-react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { loginAction, type LoginState } from "./actions";
 
 const initialState: LoginState = {};
@@ -59,10 +60,9 @@ export default function LoginPage() {
             >
               رمز عبور
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}

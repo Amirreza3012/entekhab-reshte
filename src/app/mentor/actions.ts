@@ -2,7 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/session";
-import { addChoice, moveChoice, removeChoice, ChoiceError } from "@/lib/choices";
+import {
+  addChoice,
+  moveChoice,
+  removeChoice,
+  reorderAllChoices,
+  ChoiceError,
+} from "@/lib/choices";
 import { getMenteeOrThrow } from "@/lib/mentor";
 import { prisma } from "@/lib/prisma";
 import { Role, MentorAction } from "@/generated/prisma/client";
@@ -47,6 +53,29 @@ export async function moveChoiceForStudentAction(formData: FormData) {
   await moveChoice({ choiceId, direction, actorId: mentor.id, actorRole: Role.MENTOR });
 
   revalidatePath(`/mentor/students/${studentId}`);
+}
+
+export async function reorderChoicesForStudentAction(
+  studentId: string,
+  orderedChoiceIds: string[]
+): Promise<ActionResult> {
+  const mentor = await requireRole(Role.MENTOR);
+
+  try {
+    await reorderAllChoices({
+      studentId,
+      orderedChoiceIds,
+      actorId: mentor.id,
+      actorRole: Role.MENTOR,
+    });
+  } catch (error) {
+    if (error instanceof ChoiceError) return { error: error.message };
+    throw error;
+  }
+
+  revalidatePath(`/mentor/students/${studentId}`);
+  revalidatePath(`/mentor/students/${studentId}/choices`);
+  return {};
 }
 
 export async function addMentorNoteAction(formData: FormData) {
