@@ -65,7 +65,7 @@ export default async function AdminHomePage() {
                     <td className="px-3 py-3 font-medium text-slate-900">
                       {mentor.name}
                     </td>
-                    <td className="px-3 py-3 text-slate-600" dir="ltr">
+                    <td className="px-3 py-3 text-right text-slate-600" dir="ltr">
                       {mentor.email}
                     </td>
                     <td className="px-3 py-3 text-slate-700">

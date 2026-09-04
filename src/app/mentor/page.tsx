@@ -36,7 +36,7 @@ export default async function MentorHomePage() {
                   <td className="px-3 py-3 font-medium text-slate-900">
                     {student.name}
                   </td>
-                  <td className="px-3 py-3 text-slate-600" dir="ltr">
+                  <td className="px-3 py-3 text-right text-slate-600" dir="ltr">
                     {student.email}
                   </td>
                   <td className="px-3 py-3 text-slate-700">

@@ -75,6 +75,7 @@ export function CreateUserForm() {
       >
         <option value="STUDENT">دانش‌آموز</option>
         <option value="MENTOR">منتور</option>
+        <option value="SUPERVISOR">ناظر</option>
         <option value="ADMIN">ادمین</option>
       </select>
 

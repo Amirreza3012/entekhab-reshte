@@ -8,6 +8,7 @@ import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { MajorFilters } from "@/components/MajorFilters";
 import { MajorResultsTable } from "@/components/MajorResultsTable";
 import { Pagination } from "@/components/Pagination";
+import { BackLink } from "@/components/BackLink";
 import { MentorAddChoiceButton } from "@/components/MentorAddChoiceButton";
 import { RemoveChoiceInlineButton } from "@/components/RemoveChoiceInlineButton";
 import { ChoiceList } from "@/components/ChoiceList";
@@ -100,9 +101,11 @@ export default async function MentorStudentPage({
 
   return (
     <div className="flex flex-col gap-8">
+      <BackLink href="/mentor" label="بازگشت به دانش‌آموزان من" />
+
       <div>
         <h1 className="text-lg font-bold text-slate-900">{student.name}</h1>
-        <p className="text-sm text-slate-500" dir="ltr">
+        <p className="text-right text-sm text-slate-500" dir="ltr">
           {student.email}
         </p>
       </div>

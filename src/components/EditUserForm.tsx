@@ -17,7 +17,7 @@ export function EditUserForm({
   userId: string;
   defaultName: string;
   defaultEmail: string;
-  defaultRole: "ADMIN" | "MENTOR" | "STUDENT";
+  defaultRole: "ADMIN" | "SUPERVISOR" | "MENTOR" | "STUDENT";
 }) {
   const [state, formAction, pending] = useActionState(
     updateUserAction,
@@ -81,12 +81,15 @@ export function EditUserForm({
             name="role"
             value={role}
             onChange={(e) =>
-              setRole(e.target.value as "ADMIN" | "MENTOR" | "STUDENT")
+              setRole(
+                e.target.value as "ADMIN" | "SUPERVISOR" | "MENTOR" | "STUDENT"
+              )
             }
             className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
           >
             <option value="STUDENT">دانش‌آموز</option>
             <option value="MENTOR">منتور</option>
+            <option value="SUPERVISOR">ناظر</option>
             <option value="ADMIN">ادمین</option>
           </select>
         </div>

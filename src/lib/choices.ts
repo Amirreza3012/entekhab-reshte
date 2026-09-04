@@ -27,6 +27,9 @@ async function authorize(
     await assertMentorOwnsStudent(actorId, studentId);
     return;
   }
+  if (actorRole === Role.ADMIN || actorRole === Role.SUPERVISOR) {
+    return;
+  }
   throw new ChoiceError("دسترسی غیرمجاز.");
 }
 

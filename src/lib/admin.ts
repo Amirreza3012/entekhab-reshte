@@ -20,6 +20,13 @@ export function getMentors() {
   });
 }
 
+export function getSupervisors() {
+  return prisma.user.findMany({
+    where: { role: Role.SUPERVISOR },
+    orderBy: { name: "asc" },
+  });
+}
+
 export function getUserById(id: string) {
   return prisma.user.findUnique({ where: { id } });
 }
@@ -27,6 +34,17 @@ export function getUserById(id: string) {
 export function getStudents() {
   return prisma.user.findMany({
     where: { role: Role.STUDENT },
+    orderBy: { name: "asc" },
+    include: {
+      mentor: { select: { id: true, name: true } },
+      _count: { select: { choices: true } },
+    },
+  });
+}
+
+export function getStudentsWithChoices() {
+  return prisma.user.findMany({
+    where: { role: Role.STUDENT, choices: { some: {} } },
     orderBy: { name: "asc" },
     include: {
       mentor: { select: { id: true, name: true } },

@@ -10,7 +10,7 @@ export function PasswordInput({
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="relative w-full">
+    <div className="relative flex w-full">
       <input
         {...props}
         type={visible ? "text" : "password"}

@@ -15,7 +15,12 @@ export const authConfig = {
       const user = auth?.user;
       const { pathname } = request.nextUrl;
 
-      const protectedPrefixes = ["/admin", "/mentor", "/student"] as const;
+      const protectedPrefixes = [
+        "/admin",
+        "/supervisor",
+        "/mentor",
+        "/student",
+      ] as const;
       const matchedPrefix = protectedPrefixes.find((prefix) =>
         pathname.startsWith(prefix)
       );
