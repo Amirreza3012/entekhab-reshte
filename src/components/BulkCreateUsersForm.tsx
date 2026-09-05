@@ -47,7 +47,7 @@ export function BulkCreateUsersForm() {
           name="file"
           accept=".xlsx,.xls"
           required
-          className="flex flex-1 items-center text-sm text-slate-600 file:ml-3 file:rounded-lg file:border file:border-slate-300 file:bg-slate-50 file:px-3 file:py-1.5 file:text-sm file:text-slate-700 file:transition hover:file:bg-slate-100"
+          className="flex-1 align-middle text-sm text-slate-600 file:ml-3 file:align-middle file:rounded-lg file:border file:border-slate-300 file:bg-slate-50 file:px-3 file:py-1.5 file:text-sm file:text-slate-700 file:transition hover:file:bg-slate-100"
         />
         <button
           type="submit"
