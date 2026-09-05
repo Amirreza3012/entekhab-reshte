@@ -15,13 +15,18 @@ export function BulkCreateUsersForm() {
     initialState
   );
 
+  const [fileName, setFileName] = useState<string | null>(null);
+
   // Reset the file input after a run that created at least one user, using
   // React's "adjust state during render" pattern instead of an effect.
   const [formKey, setFormKey] = useState(0);
   const [lastHandledState, setLastHandledState] = useState(state);
   if (state !== lastHandledState) {
     setLastHandledState(state);
-    if (state.successCount) setFormKey((k) => k + 1);
+    if (state.successCount) {
+      setFormKey((k) => k + 1);
+      setFileName(null);
+    }
   }
 
   useEffect(() => {
@@ -42,13 +47,20 @@ export function BulkCreateUsersForm() {
       className="flex flex-col gap-4 rounded-[1.5rem] border border-white bg-white/90 p-5 shadow-lg shadow-slate-200/40"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <input
-          type="file"
-          name="file"
-          accept=".xlsx,.xls"
-          required
-          className="flex-1 align-middle text-sm text-slate-600 file:ml-3 file:align-middle file:rounded-lg file:border file:border-slate-300 file:bg-slate-50 file:px-3 file:py-1.5 file:text-sm file:text-slate-700 file:transition hover:file:bg-slate-100"
-        />
+        <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-lg border border-slate-300 bg-white px-1.5 py-1.5 text-sm text-slate-600 transition hover:border-slate-400">
+          <span className="shrink-0 rounded-lg border border-slate-300 bg-slate-50 px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100">
+            انتخاب فایل
+          </span>
+          <span className="truncate">{fileName ?? "فایلی انتخاب نشده"}</span>
+          <input
+            type="file"
+            name="file"
+            accept=".xlsx,.xls"
+            required
+            className="sr-only"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+          />
+        </label>
         <button
           type="submit"
           disabled={pending}
