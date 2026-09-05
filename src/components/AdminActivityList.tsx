@@ -47,14 +47,14 @@ export function AdminActivityList({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row">
+      <div className="flex flex-col gap-3 rounded-2xl border border-white bg-white/85 p-4 shadow-sm shadow-slate-200/60 sm:flex-row">
         <div className="relative flex-1">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="جستجو در نام یا ایمیل دانش‌آموز"
-            className="w-full rounded-lg border border-slate-300 py-2 pl-3 pr-9 text-sm outline-none focus:border-slate-500"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pl-3 pr-9 text-sm outline-none"
           />
           <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         </div>
@@ -62,7 +62,7 @@ export function AdminActivityList({
         <select
           value={mentorFilter}
           onChange={(e) => setMentorFilter(e.target.value)}
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500 sm:w-56"
+          className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-sm outline-none sm:w-56"
         >
           <option value="">همه منتورها</option>
           <option value="NONE">بدون منتور</option>
@@ -79,9 +79,9 @@ export function AdminActivityList({
           موردی مطابق با جستجو/فیلتر یافت نشد.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-2xl border border-white bg-white/90 shadow-sm shadow-slate-200/70">
           <table className="w-full min-w-[700px] text-sm">
-            <thead className="bg-slate-50 text-slate-500">
+            <thead className="bg-slate-50/80 text-xs text-slate-500">
               <tr className="text-right">
                 <th className="px-3 py-2 font-medium">نام دانش‌آموز</th>
                 <th className="px-3 py-2 font-medium">ایمیل</th>
@@ -92,7 +92,7 @@ export function AdminActivityList({
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.map((student) => (
-                <tr key={student.id}>
+                <tr key={student.id} className="transition-colors hover:bg-indigo-50/35">
                   <td className="px-3 py-3 font-medium text-slate-900">
                     {student.name}
                   </td>

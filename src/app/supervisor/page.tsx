@@ -10,7 +10,7 @@ export default async function SupervisorActivityPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-lg font-bold text-slate-900">فعالیت‌های کاربران</h1>
+      <div className="rounded-[2rem] bg-[#111827] p-6 text-white shadow-xl sm:p-8"><p className="mb-2 text-xs font-bold text-[#dfff4f]">نمای نظارتی</p><h1 className="!text-white">فعالیت‌های کاربران</h1><p className="mt-2 text-sm text-white/45">وضعیت انتخاب‌های دانش‌آموزان و عملکرد منتورها را رصد کنید.</p></div>
 
       {students.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">

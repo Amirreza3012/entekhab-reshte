@@ -12,7 +12,7 @@ export default async function MentorHomePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-lg font-bold text-slate-900">دانش‌آموزان من</h1>
+      <div className="rounded-[2rem] bg-[#111827] p-6 text-white shadow-xl sm:p-8"><p className="mb-2 text-xs font-bold text-[#dfff4f]">فضای کاری منتور</p><h1 className="!text-white">دانش‌آموزان من</h1><p className="mt-2 text-sm text-white/45">روند انتخاب‌ها را ببینید و قدم‌به‌قدم همراهشان باشید.</p></div>
 
       {mentees.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
@@ -32,7 +32,7 @@ export default async function MentorHomePage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {mentees.map((student) => (
-                <tr key={student.id}>
+                <tr key={student.id} className="transition-colors hover:bg-violet-50/40">
                   <td className="px-3 py-3 font-medium text-slate-900">
                     {student.name}
                   </td>

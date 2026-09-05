@@ -66,18 +66,18 @@ export function SearchableSelect({
             setOpen(true);
           }}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
+          className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-sm outline-none"
         />
         <ChevronDown className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
       </div>
 
       {open && (
-        <ul className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 bg-white text-sm shadow-md">
+        <ul className="absolute z-30 mt-2 max-h-56 w-full overflow-auto rounded-2xl border border-white bg-white p-1.5 text-sm shadow-xl shadow-slate-300/40">
           <li>
             <button
               type="button"
               onClick={clear}
-              className="block w-full px-3 py-2 text-right text-slate-500 hover:bg-slate-50"
+              className="block w-full rounded-xl px-3 py-2 text-right text-slate-500 hover:bg-slate-50"
             >
               {placeholder}
             </button>
@@ -90,8 +90,8 @@ export function SearchableSelect({
                 <button
                   type="button"
                   onClick={() => select(option)}
-                  className={`block w-full px-3 py-2 text-right hover:bg-slate-50 ${
-                    option === value ? "bg-slate-100 font-medium" : ""
+                  className={`block w-full rounded-xl px-3 py-2 text-right hover:bg-violet-50 ${
+                    option === value ? "bg-violet-50 font-bold text-violet-700" : ""
                   }`}
                 >
                   {option}

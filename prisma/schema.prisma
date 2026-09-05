@@ -75,7 +75,7 @@ model Major {
 
   choices Choice[]
 
-  @@unique([examYear, majorCode])
+  @@unique([examYear, majorCode, gender, termType])
   @@index([fieldGroup])
   @@index([province])
   @@index([university])

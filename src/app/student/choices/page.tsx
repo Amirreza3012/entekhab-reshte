@@ -10,6 +10,7 @@ import {
   reorderChoicesAction,
 } from "@/app/student/actions";
 import { toPersianDigits } from "@/lib/format";
+import { PageHero } from "@/components/PageHero";
 
 export default async function StudentChoicesPage() {
   const user = await requireRole(Role.STUDENT);
@@ -17,10 +18,8 @@ export default async function StudentChoicesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-lg font-bold text-slate-900">انتخاب‌های من</h1>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-500">
+      <PageHero eyebrow="لیست اولویت‌ها" title="انتخاب‌های من" description="ترتیب انتخاب‌ها را با کشیدن جابه‌جا کنید و نسخه نهایی را خروجی بگیرید." aside={<div className="flex items-center gap-2">
+          <span className="rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white">
             {toPersianDigits(choices.length)} از {toPersianDigits(MAX_CHOICES)}
           </span>
           <PdfExportButton
@@ -28,8 +27,7 @@ export default async function StudentChoicesPage() {
             choices={choices}
             fileName="انتخاب-های-من.pdf"
           />
-        </div>
-      </div>
+        </div>} />
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1">

@@ -7,6 +7,7 @@ import { MentorAssignSelect } from "@/components/MentorAssignSelect";
 import { DeleteUserButton } from "@/components/DeleteUserButton";
 import { MAX_CHOICES } from "@/lib/choices";
 import { toPersianDigits } from "@/lib/format";
+import { PageHero } from "@/components/PageHero";
 
 export default async function AdminUsersPage() {
   const [students, mentors, supervisors] = await Promise.all([
@@ -17,8 +18,9 @@ export default async function AdminUsersPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      <PageHero eyebrow="مدیریت دسترسی" title="کاربران سامانه" description="حساب‌های جدید بسازید، نقش‌ها را مدیریت کنید و هر دانش‌آموز را به منتور مناسب بسپارید." />
       <section className="flex flex-col gap-3">
-        <h1 className="text-lg font-bold text-slate-900">ایجاد کاربر جدید</h1>
+        <h2 className="text-lg font-bold text-slate-900">ایجاد کاربر جدید</h2>
         <CreateUserForm />
       </section>
 

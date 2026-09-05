@@ -11,14 +11,17 @@ const vazirmatn = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "سامانه انتخاب رشته",
+  title: {
+    default: "سامانه انتخاب رشته | باورنو",
+    template: "%s | باورنو",
+  },
   description: "مدیریت انتخاب رشته دانش‌آموزان",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased">
+    <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full w-full`}>
+      <body className="min-h-full w-full max-w-full overflow-x-hidden antialiased text-slate-800">
         {children}
         <Toaster position="top-center" richColors dir="rtl" />
       </body>

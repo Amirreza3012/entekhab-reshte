@@ -104,7 +104,14 @@ async function main() {
 
   for (const m of majors) {
     await prisma.major.upsert({
-      where: { examYear_majorCode: { examYear: 1404, majorCode: m.majorCode } },
+      where: {
+        examYear_majorCode_gender_termType: {
+          examYear: 1404,
+          majorCode: m.majorCode,
+          gender: m.gender,
+          termType: m.termType,
+        },
+      },
       update: {},
       create: { examYear: 1404, ...m },
     });

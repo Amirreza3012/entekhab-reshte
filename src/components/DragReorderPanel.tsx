@@ -102,18 +102,18 @@ export function DragReorderPanel({
   }
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:w-80 lg:shrink-0">
+    <div className="flex w-full flex-col gap-3 rounded-[1.5rem] border border-white bg-[#111827] p-5 text-white shadow-xl lg:w-80 lg:shrink-0">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-slate-800">جابجایی با کشیدن</h2>
-        <span className="text-xs text-slate-400">
+        <h2 className="!text-white">جابجایی با کشیدن</h2>
+        <span className="rounded-lg bg-[#dfff4f] px-2 py-1 text-[10px] font-bold text-slate-950">
           {toPersianDigits(items.length)} انتخاب
         </span>
       </div>
-      <p className="text-xs text-slate-500">
+      <p className="text-xs leading-6 text-white/40">
         هر ردیف را با ماوس بکشید و در جایگاه جدید رها کنید.
       </p>
 
-      <div className="max-h-[70vh] overflow-y-auto rounded-lg border border-slate-100">
+      <div className="max-h-[70vh] overflow-y-auto rounded-xl border border-white/10 bg-white/5 p-1">
         <DndContext
           id={`drag-reorder-${studentId}`}
           sensors={sensors}
@@ -124,7 +124,7 @@ export function DragReorderPanel({
             items={items.map((c) => c.id)}
             strategy={verticalListSortingStrategy}
           >
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-white/8">
               {items.map((choice, index) => (
                 <DraggableRow
                   key={choice.id}
@@ -166,29 +166,29 @@ function DraggableRow({
     <li
       ref={setNodeRef}
       style={style}
-      className="flex items-start gap-2 bg-white px-2 py-2 text-sm"
+      className="flex items-start gap-2 rounded-lg bg-transparent px-2 py-2.5 text-sm text-white transition hover:bg-white/5"
     >
       <button
         type="button"
         {...attributes}
         {...listeners}
-        className="cursor-grab touch-none rounded-md p-1 text-slate-400 hover:bg-slate-100 active:cursor-grabbing"
+        className="cursor-grab touch-none rounded-md p-1 text-white/30 hover:bg-white/10 hover:text-white active:cursor-grabbing"
         title="جابجا کردن"
       >
         <GripVertical className="h-4 w-4" />
       </button>
-      <span className="w-6 shrink-0 text-center text-xs font-medium text-slate-500">
+      <span className="w-6 shrink-0 text-center text-xs font-bold text-[#dfff4f]">
         {toPersianDigits(rank)}
       </span>
       <span className="min-w-0 flex-1">
         <span
-          className="block truncate text-slate-800"
+          className="block truncate text-white/90"
           title={choice.major.title}
         >
           {choice.major.title}
         </span>
         <span
-          className="block truncate text-xs text-slate-400"
+          className="block truncate text-xs text-white/35"
           title={choice.major.university}
         >
           {choice.major.university}
@@ -197,7 +197,7 @@ function DraggableRow({
       <button
         type="button"
         onClick={onRemove}
-        className="shrink-0 rounded-md p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
+        className="shrink-0 rounded-md p-1 text-white/25 hover:bg-rose-500/10 hover:text-rose-300"
         title="حذف"
       >
         <X className="h-4 w-4" />

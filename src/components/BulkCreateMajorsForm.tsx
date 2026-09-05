@@ -4,18 +4,21 @@ import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Upload, Download } from "lucide-react";
-import { bulkCreateUsersAction, type BulkCreateResult } from "@/app/admin/actions";
+import {
+  bulkCreateMajorsAction,
+  type BulkCreateMajorsResult,
+} from "@/app/admin/majors/actions";
 import { toPersianDigits } from "@/lib/format";
 
-const initialState: BulkCreateResult = {};
+const initialState: BulkCreateMajorsResult = {};
 
-export function BulkCreateUsersForm() {
+export function BulkCreateMajorsForm() {
   const [state, formAction, pending] = useActionState(
-    bulkCreateUsersAction,
+    bulkCreateMajorsAction,
     initialState
   );
 
-  // Reset the file input after a run that created at least one user, using
+  // Reset the file input after a run that created at least one major, using
   // React's "adjust state during render" pattern instead of an effect.
   const [formKey, setFormKey] = useState(0);
   const [lastHandledState, setLastHandledState] = useState(state);
@@ -29,8 +32,8 @@ export function BulkCreateUsersForm() {
     else if (state.successCount !== undefined) {
       toast.success(
         state.successCount > 0
-          ? `${toPersianDigits(state.successCount)} کاربر با موفقیت ایجاد شد.`
-          : "هیچ کاربر جدیدی ایجاد نشد."
+          ? `${toPersianDigits(state.successCount)} رشته با موفقیت ایجاد شد.`
+          : "هیچ رشته‌ی جدیدی ایجاد نشد."
       );
     }
   }, [state]);
@@ -55,10 +58,10 @@ export function BulkCreateUsersForm() {
           className="flex items-center justify-center gap-2 rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-violet-600 disabled:opacity-60"
         >
           <Upload className="h-4 w-4" />
-          {pending ? "در حال بررسی و ایجاد..." : "آپلود و ایجاد کاربران"}
+          {pending ? "در حال بررسی و ایجاد..." : "آپلود و ایجاد رشته‌ها"}
         </button>
         <Link
-          href="/admin/users/template"
+          href="/admin/majors/template"
           className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-[#f6f7f2] px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-violet-200 hover:text-violet-600"
         >
           <Download className="h-4 w-4" />
@@ -67,8 +70,10 @@ export function BulkCreateUsersForm() {
       </div>
 
       <p className="text-xs text-slate-500">
-        فایل باید ستون‌های «نام و نام خانوادگی»، «ایمیل»، «رمز عبور» و «نقش» را
-        داشته باشد. مقدار نقش یکی از این‌ها: دانش‌آموز، منتور، ناظر، ادمین.
+        ستون‌های الزامی: گروه آزمایشی، استان، دانشگاه، دوره تحصیلی، کدرشته
+        محل، عنوان رشته. ستون‌های اختیاری: سال کنکور (پیش‌فرض ۱۴۰۴)، ظرفیت،
+        نیمسال (اول/دوم/نامشخص)، جنسیت (زن/مرد/هردو)، توضیحات. اگر یک
+        کدرشته‌محل برای دو جنسیت ظرفیت جدا دارد، برایش دو سطر جدا بنویسید.
       </p>
 
       {state.rowErrors && state.rowErrors.length > 0 && (

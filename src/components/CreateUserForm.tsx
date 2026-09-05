@@ -40,7 +40,7 @@ export function CreateUserForm() {
   return (
     <form
       action={formAction}
-      className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4"
+      className="grid grid-cols-1 gap-3 rounded-[1.5rem] border border-white bg-white/90 p-5 shadow-lg shadow-slate-200/40 sm:grid-cols-2 lg:grid-cols-4"
     >
       <input
         name="name"
@@ -82,7 +82,7 @@ export function CreateUserForm() {
       <button
         type="submit"
         disabled={pending}
-        className="flex items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60 lg:col-span-4"
+        className="flex items-center justify-center gap-2 rounded-xl bg-[#5b5cf0] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-[#5051dc] disabled:opacity-60 lg:col-span-4"
       >
         <UserPlus className="h-4 w-4" />
         {pending ? "در حال ایجاد..." : "ایجاد کاربر"}

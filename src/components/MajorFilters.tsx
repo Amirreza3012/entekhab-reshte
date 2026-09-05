@@ -26,14 +26,14 @@ export function MajorFilters({
     <form
       action={action}
       method="get"
-      className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-5"
+      className="grid grid-cols-1 gap-3 rounded-[1.5rem] border border-white bg-white/90 p-5 shadow-lg shadow-slate-200/40 backdrop-blur sm:grid-cols-2 lg:grid-cols-5"
     >
       <input
         type="text"
         name="q"
         placeholder="جستجو در عنوان رشته، دانشگاه یا کدرشته"
         defaultValue={defaults.q}
-        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 lg:col-span-2"
+        className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-sm outline-none lg:col-span-2"
       />
 
       <SearchableSelect
@@ -60,7 +60,7 @@ export function MajorFilters({
       <select
         name="gender"
         defaultValue={defaults.gender ?? "ANY"}
-        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
+        className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-sm outline-none"
       >
         <option value="ANY">هر جنسیتی</option>
         <option value="FEMALE">زن</option>
@@ -69,7 +69,7 @@ export function MajorFilters({
 
       <button
         type="submit"
-        className="flex items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+        className="flex items-center justify-center gap-2 rounded-xl bg-[#5b5cf0] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-[#5051dc]"
       >
         <Filter className="h-4 w-4" />
         اعمال فیلتر

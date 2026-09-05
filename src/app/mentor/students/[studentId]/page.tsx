@@ -9,14 +9,14 @@ import { MajorFilters } from "@/components/MajorFilters";
 import { MajorResultsTable } from "@/components/MajorResultsTable";
 import { Pagination } from "@/components/Pagination";
 import { BackLink } from "@/components/BackLink";
-import { MentorAddChoiceButton } from "@/components/MentorAddChoiceButton";
-import { RemoveChoiceInlineButton } from "@/components/RemoveChoiceInlineButton";
+import { ChoiceToggleButton } from "@/components/ChoiceToggleButton";
 import { ChoiceList } from "@/components/ChoiceList";
 import { MentorLogItem } from "@/components/MentorLogItem";
 import { PdfExportButton } from "@/components/PdfExportButton";
 import {
   moveChoiceForStudentAction,
   removeChoiceForStudentAction,
+  addChoiceForStudentAction,
   addMentorNoteAction,
 } from "@/app/mentor/actions";
 import { toPersianDigits } from "@/lib/format";
@@ -164,29 +164,18 @@ export default async function MentorStudentPage({
         </p>
         <MajorResultsTable
           items={results.items}
-          renderAction={(major) => {
-            const choiceId = choiceIdByMajorId.get(major.id);
-            if (choiceId) {
-              return (
-                <RemoveChoiceInlineButton
-                  action={removeChoiceForStudentAction}
-                  choiceId={choiceId}
-                  extraHiddenFields={{ studentId }}
-                />
-              );
-            }
-            if (atLimit) {
-              return (
-                <MentorAddChoiceButton
-                  studentId={studentId}
-                  majorId={major.id}
-                  disabled
-                  disabledReason="سقف تکمیل است"
-                />
-              );
-            }
-            return <MentorAddChoiceButton studentId={studentId} majorId={major.id} />;
-          }}
+          isChosen={(major) => choiceIdByMajorId.has(major.id)}
+          renderAction={(major) => (
+            <ChoiceToggleButton
+              majorId={major.id}
+              choiceId={choiceIdByMajorId.get(major.id) ?? null}
+              addAction={addChoiceForStudentAction}
+              removeAction={removeChoiceForStudentAction}
+              disabled={atLimit}
+              disabledReason="سقف تکمیل است"
+              extraHiddenFields={{ studentId }}
+            />
+          )}
         />
         <Pagination page={results.page} pageCount={results.pageCount} buildHref={buildHref} />
       </section>

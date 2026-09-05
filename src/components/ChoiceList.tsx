@@ -23,16 +23,16 @@ export function ChoiceList({
 
   if (choices.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center text-sm text-slate-500 shadow-sm">
         هنوز هیچ رشته‌ای انتخاب نشده است.
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+    <div className="overflow-x-auto rounded-2xl border border-white bg-white/90 shadow-sm shadow-slate-200/70">
       <table className="w-full min-w-[800px] text-sm">
-        <thead className="bg-slate-50 text-slate-500">
+        <thead className="bg-slate-50/80 text-xs text-slate-500">
           <tr className="text-right">
             <th className="w-14 px-3 py-2 font-medium">رتبه</th>
             <th className="px-3 py-2 font-medium">رشته</th>
@@ -43,7 +43,7 @@ export function ChoiceList({
         </thead>
         <tbody className="divide-y divide-slate-100">
           {choices.map((choice, index) => (
-            <tr key={choice.id}>
+            <tr key={choice.id} className="transition-colors hover:bg-indigo-50/35">
               <td className="px-3 py-3 font-medium text-slate-900">
                 {toPersianDigits(choice.rank)}
               </td>

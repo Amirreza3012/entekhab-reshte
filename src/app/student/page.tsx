@@ -7,9 +7,8 @@ import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { MajorFilters } from "@/components/MajorFilters";
 import { MajorResultsTable } from "@/components/MajorResultsTable";
 import { Pagination } from "@/components/Pagination";
-import { AddChoiceButton } from "@/components/AddChoiceButton";
-import { RemoveChoiceInlineButton } from "@/components/RemoveChoiceInlineButton";
-import { removeChoiceAction } from "@/app/student/actions";
+import { ChoiceToggleButton } from "@/components/ChoiceToggleButton";
+import { addChoiceAction, removeChoiceAction } from "@/app/student/actions";
 import { toPersianDigits } from "@/lib/format";
 
 type SearchParams = {
@@ -60,15 +59,18 @@ export default async function StudentSearchPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-lg font-bold text-slate-900">جستجوی رشته‌ها</h1>
+      <div className="relative overflow-hidden rounded-[2rem] bg-[#111827] p-6 text-white shadow-xl sm:p-8">
+        <div className="absolute -left-10 -top-16 h-52 w-52 rounded-full bg-violet-500/30 blur-3xl" />
+        <div className="relative flex flex-wrap items-end justify-between gap-5">
+        <div><p className="mb-2 text-xs font-bold text-[#dfff4f]">بانک جامع رشته‌محل‌ها</p><h1 className="!text-white">رشته مناسب تو همین‌جاست</h1><p className="mt-2 text-sm text-white/45">جست‌وجو کن، مقایسه کن و بهترین‌ها را به لیستت اضافه کن.</p></div>
         <Link
           href="/student/choices"
-          className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+          className="flex items-center gap-2 rounded-xl bg-[#dfff4f] px-4 py-3 text-sm font-black text-slate-950 shadow-sm hover:bg-white"
         >
           <ClipboardList className="h-4 w-4" />
           انتخاب‌های من ({toPersianDigits(currentChoices.length)}/{toPersianDigits(MAX_CHOICES)})
         </Link>
+        </div>
       </div>
 
       <MajorFilters
@@ -89,27 +91,17 @@ export default async function StudentSearchPage({
 
       <MajorResultsTable
         items={results.items}
-        renderAction={(major) => {
-          const choiceId = choiceIdByMajorId.get(major.id);
-          if (choiceId) {
-            return (
-              <RemoveChoiceInlineButton
-                action={removeChoiceAction}
-                choiceId={choiceId}
-              />
-            );
-          }
-          if (atLimit) {
-            return (
-              <AddChoiceButton
-                majorId={major.id}
-                disabled
-                disabledReason="سقف تکمیل است"
-              />
-            );
-          }
-          return <AddChoiceButton majorId={major.id} />;
-        }}
+        isChosen={(major) => choiceIdByMajorId.has(major.id)}
+        renderAction={(major) => (
+          <ChoiceToggleButton
+            majorId={major.id}
+            choiceId={choiceIdByMajorId.get(major.id) ?? null}
+            addAction={addChoiceAction}
+            removeAction={removeChoiceAction}
+            disabled={atLimit}
+            disabledReason="سقف تکمیل است"
+          />
+        )}
       />
 
       <Pagination page={results.page} pageCount={results.pageCount} buildHref={buildHref} />

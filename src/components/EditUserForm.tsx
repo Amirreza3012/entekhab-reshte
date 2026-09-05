@@ -45,7 +45,7 @@ export function EditUserForm({
   return (
     <form
       action={formAction}
-      className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4"
+      className="flex flex-col gap-5 rounded-[1.5rem] border border-white bg-white/90 p-6 shadow-lg shadow-slate-200/40"
     >
       <input type="hidden" name="userId" value={userId} />
 
@@ -111,7 +111,7 @@ export function EditUserForm({
       <button
         type="submit"
         disabled={pending}
-        className="flex items-center gap-1.5 self-start rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60"
+        className="flex items-center gap-2 self-start rounded-xl bg-[#5b5cf0] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-[#5051dc] disabled:opacity-60"
       >
         <Save className="h-4 w-4" />
         {pending ? "در حال ذخیره..." : "ذخیره تغییرات"}

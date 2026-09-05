@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f6f7f2;
+  --foreground: #111827;
+  --brand: #5b5cf0;
+  --accent: #dfff4f;
+  --surface: #ffffff;
 }
 
 @theme inline {
@@ -12,9 +15,183 @@
 }
 
 body {
+  margin: 0;
+  min-width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-vazirmatn), Tahoma, sans-serif;
+  background-image: radial-gradient(circle at 8% 8%, rgb(91 92 240 / 0.06), transparent 26rem);
+  background-attachment: fixed;
+  letter-spacing: -0.012em;
+}
+
+html {
+  min-width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  background: var(--background);
+}
+
+main {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+* {
+  border-color: rgb(226 232 240 / 0.9);
+}
+
+::selection {
+  background: #dfff4f;
+  color: #111827;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  outline-offset: 3px;
+}
+
+input,
+select,
+textarea {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #5b5cf0 !important;
+  box-shadow: 0 0 0 4px rgb(91 92 240 / 0.1);
+}
+
+.app-main > div {
+  margin-inline: auto;
+  max-width: 96rem;
+}
+
+.app-main {
+  max-width: 100vw;
+}
+
+.app-main h1 {
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  color: #111827;
+}
+
+.app-main section > h2,
+.app-main section > div > h2 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.app-main table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.app-main thead {
+  background: #f7f7f4;
+}
+
+.app-main th {
+  padding-block: 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.app-main td {
+  padding-block: 0.95rem;
+}
+
+.app-main tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.app-main tbody tr:hover {
+  background: rgb(91 92 240 / 0.035);
+}
+
+.app-main .overflow-x-auto:has(> table) {
+  border: 1px solid rgb(255 255 255 / 0.95) !important;
+  border-radius: 1.5rem !important;
+  background: rgb(255 255 255 / 0.9) !important;
+  box-shadow: 0 14px 45px rgb(17 24 39 / 0.055);
+}
+
+.app-main .rounded-xl.border.bg-white {
+  border-color: rgb(255 255 255 / 0.95) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 12px 40px rgb(17 24 39 / 0.05);
+}
+
+.app-main .border-dashed {
+  border-radius: 1.5rem !important;
+  border-color: #d7d9d0 !important;
+  background: rgb(255 255 255 / 0.62) !important;
+  padding-block: 3.5rem !important;
+}
+
+.app-main button.bg-slate-900,
+.app-main a.bg-slate-900 {
+  border-radius: 0.9rem !important;
+  background: #5b5cf0 !important;
+  box-shadow: 0 8px 20px rgb(91 92 240 / 0.18);
+}
+
+.app-main button.bg-slate-900:hover,
+.app-main a.bg-slate-900:hover {
+  background: #4f50dc !important;
+  transform: translateY(-1px);
+}
+
+.app-main section {
+  scroll-margin-top: 6rem;
+}
+
+.app-main input,
+.app-main select,
+.app-main textarea {
+  min-height: 2.7rem;
+  border-radius: 0.85rem;
+  border-color: #e5e7eb;
+  background-color: #fafaf8;
+}
+
+.app-main button,
+.app-main a {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 160ms;
+}
+
+@media (max-width: 640px) {
+  .app-main h1 { font-size: 1.4rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  main {
+    animation: page-enter 360ms ease-out both;
+  }
+
+  @keyframes page-enter {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }
 
 /* sonner injects its own font-family on the toaster; override it to match the app font */

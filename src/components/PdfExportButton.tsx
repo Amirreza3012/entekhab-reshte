@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useState, type CSSProperties } from "react";
+import { useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { FileDown } from "lucide-react";
 import { toast } from "sonner";
 import type { Choice, Major } from "@/generated/prisma/client";
 import { toPersianDigits } from "@/lib/format";
 
 type ChoiceWithMajor = Choice & { major: Major };
+const subscribeToClient = () => () => {};
 
 export function PdfExportButton({
   studentName,
@@ -20,6 +22,12 @@ export function PdfExportButton({
   const printRef = useRef<HTMLDivElement>(null);
   const timestampRef = useRef<HTMLParagraphElement>(null);
   const [exporting, setExporting] = useState(false);
+  const isClient = useSyncExternalStore(
+    subscribeToClient,
+    () => true,
+    () => false
+  );
+  const portalTarget = isClient ? document.body : null;
 
   const handleExport = async () => {
     if (!printRef.current) return;
@@ -34,6 +42,13 @@ export function PdfExportButton({
 
       const [{ default: html2canvas }, { default: JsPDF }] =
         await Promise.all([import("html2canvas"), import("jspdf")]);
+
+      // Keep the printable area independent from the app theme and wait for
+      // the Persian font to be fully shaped before rasterizing it.
+      await document.fonts.ready;
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve())
+      );
 
       const canvas = await html2canvas(printRef.current, {
         scale: 4,
@@ -73,29 +88,39 @@ export function PdfExportButton({
         type="button"
         onClick={handleExport}
         disabled={exporting}
-        className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+        className="flex items-center gap-2 rounded-xl border border-white/15 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:text-violet-600 disabled:opacity-60"
       >
         <FileDown className="h-4 w-4" />
         {exporting ? "در حال ساخت PDF..." : "خروجی PDF"}
       </button>
 
-      {/* Off-screen printable content used only for PDF rasterization */}
-      <div
-        style={{ position: "fixed", top: 0, left: "-10000px", width: "750px" }}
+      {/* Render outside app-main so dashboard styles cannot leak into the PDF. */}
+      {portalTarget && createPortal(<div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: "-10000px",
+          width: "750px",
+          pointerEvents: "none",
+        }}
       >
         <div
           ref={printRef}
           dir="rtl"
           style={{
             fontFamily: "var(--font-vazirmatn), Tahoma, Arial, sans-serif",
+            letterSpacing: "normal",
+            fontVariantLigatures: "normal",
+            textRendering: "optimizeLegibility",
             background: "#ffffff",
             color: "#111827",
             padding: "24px",
             width: "750px",
           }}
         >
-          <h1 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "4px" }}>
-            لیست انتخاب‌های رشته — {studentName}
+          <h1 style={{ fontSize: "18px", fontWeight: 700, letterSpacing: "normal", wordSpacing: "normal", marginBottom: "4px" }}>
+            لیست انتخاب‌های رشته - {studentName}
           </h1>
           <p
             ref={timestampRef}
@@ -148,7 +173,7 @@ export function PdfExportButton({
             </table>
           </div>
         </div>
-      </div>
+      </div>, portalTarget)}
     </>
   );
 }
