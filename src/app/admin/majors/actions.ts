@@ -14,6 +14,7 @@ const DEFAULT_EXAM_YEAR = 1404;
 export type BulkCreateMajorsResult = {
   error?: string;
   successCount?: number;
+  updatedCount?: number;
   rowErrors?: BulkRowError[];
 };
 
@@ -37,17 +38,20 @@ export async function bulkCreateMajorsAction(
     return { error: "فایل اکسل قابل خواندن نیست. لطفاً فرمت فایل را بررسی کنید." };
   }
 
-  const { created, errors: createErrors } = await createMajorsFromRows(parsed.rows);
+  const { created, updated, errors: createErrors } = await createMajorsFromRows(
+    parsed.rows
+  );
   const rowErrors = [...parsed.errors, ...createErrors].sort((a, b) => a.row - b.row);
 
   revalidatePath("/admin/majors");
 
-  if (created === 0 && rowErrors.length > 0) {
-    return { error: "هیچ رشته‌ای ایجاد نشد.", rowErrors };
+  if (created === 0 && updated === 0 && rowErrors.length > 0) {
+    return { error: "هیچ رشته‌ای ایجاد یا به‌روزرسانی نشد.", rowErrors };
   }
 
   return {
     successCount: created,
+    updatedCount: updated,
     rowErrors: rowErrors.length > 0 ? rowErrors : undefined,
   };
 }

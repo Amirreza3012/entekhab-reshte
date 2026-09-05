@@ -252,7 +252,7 @@ export async function parseMajorsWorkbook(
 
 export async function createMajorsFromRows(
   rows: ParsedMajorRow[]
-): Promise<{ created: number; errors: BulkRowError[] }> {
+): Promise<{ created: number; updated: number; errors: BulkRowError[] }> {
   const errors: BulkRowError[] = [];
 
   const seenKeys = new Map<string, number>();
@@ -272,7 +272,7 @@ export async function createMajorsFromRows(
   }
 
   if (deduped.length === 0) {
-    return { created: 0, errors };
+    return { created: 0, updated: 0, errors };
   }
 
   const examYears = [...new Set(deduped.map((r) => r.examYear))];
@@ -284,37 +284,44 @@ export async function createMajorsFromRows(
     existing.map((m) => `${m.examYear}|${m.majorCode}|${m.gender}|${m.termType}`)
   );
 
-  const toCreate = deduped.filter((row) => {
+  let created = 0;
+  let updated = 0;
+
+  // Upsert row-by-row (rather than createMany) so a re-upload of a
+  // corrected file overwrites the previously-imported data for the same
+  // majorCode/gender/termType instead of being skipped as a duplicate.
+  for (const row of deduped) {
     const key = `${row.examYear}|${row.majorCode}|${row.gender}|${row.termType}`;
-    if (existingKeys.has(key)) {
-      errors.push({
-        row: row.row,
-        message: "این کدرشته‌محل با همین جنسیت/نیمسال قبلاً ثبت شده است.",
-      });
-      return false;
-    }
-    return true;
-  });
-
-  if (toCreate.length === 0) {
-    return { created: 0, errors };
-  }
-
-  const result = await prisma.major.createMany({
-    data: toCreate.map((row) => ({
-      examYear: row.examYear,
+    const data = {
       fieldGroup: row.fieldGroup,
       province: row.province,
       university: row.university,
       studyPeriod: row.studyPeriod,
-      majorCode: row.majorCode,
       title: row.title,
       capacity: row.capacity,
-      termType: row.termType,
-      gender: row.gender,
       description: row.description,
-    })),
-  });
+    };
+    await prisma.major.upsert({
+      where: {
+        examYear_majorCode_gender_termType: {
+          examYear: row.examYear,
+          majorCode: row.majorCode,
+          gender: row.gender,
+          termType: row.termType,
+        },
+      },
+      create: {
+        examYear: row.examYear,
+        majorCode: row.majorCode,
+        gender: row.gender,
+        termType: row.termType,
+        ...data,
+      },
+      update: data,
+    });
+    if (existingKeys.has(key)) updated += 1;
+    else created += 1;
+  }
 
-  return { created: result.count, errors };
+  return { created, updated, errors };
 }

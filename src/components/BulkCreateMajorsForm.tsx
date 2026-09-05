@@ -24,17 +24,22 @@ export function BulkCreateMajorsForm() {
   const [lastHandledState, setLastHandledState] = useState(state);
   if (state !== lastHandledState) {
     setLastHandledState(state);
-    if (state.successCount) setFormKey((k) => k + 1);
+    if (state.successCount || state.updatedCount) setFormKey((k) => k + 1);
   }
 
   useEffect(() => {
     if (state.error) toast.error(state.error);
     else if (state.successCount !== undefined) {
-      toast.success(
-        state.successCount > 0
-          ? `${toPersianDigits(state.successCount)} رشته با موفقیت ایجاد شد.`
-          : "هیچ رشته‌ی جدیدی ایجاد نشد."
-      );
+      const created = state.successCount;
+      const updated = state.updatedCount ?? 0;
+      if (created === 0 && updated === 0) {
+        toast.success("هیچ رشته‌ی جدیدی ایجاد یا به‌روزرسانی نشد.");
+      } else {
+        const parts = [];
+        if (created > 0) parts.push(`${toPersianDigits(created)} رشته‌ی جدید ایجاد شد`);
+        if (updated > 0) parts.push(`${toPersianDigits(updated)} رشته به‌روزرسانی شد`);
+        toast.success(parts.join(" و ") + ".");
+      }
     }
   }, [state]);
 
