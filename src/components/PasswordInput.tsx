@@ -13,8 +13,9 @@ export function PasswordInput({
     <div className="relative flex w-full">
       <input
         {...props}
+        dir={props.dir ?? "ltr"}
         type={visible ? "text" : "password"}
-        className={`${className} w-full pl-9`}
+        className={`${className} w-full pl-9 text-left`}
       />
       <button
         type="button"
