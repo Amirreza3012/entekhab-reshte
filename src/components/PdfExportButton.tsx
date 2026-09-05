@@ -50,28 +50,122 @@ export function PdfExportButton({
         requestAnimationFrame(() => resolve())
       );
 
+      // Capture at a scale matching html2canvas's own rasterization so DOM
+      // row boundaries (in CSS px) map directly to canvas pixels. Scale 3
+      // renders at roughly print-quality (~270 DPI at A4 width) while still
+      // staying well under scale 4's pixel count (and file size).
+      const SCALE = 3;
       const canvas = await html2canvas(printRef.current, {
-        scale: 4,
+        scale: SCALE,
         useCORS: true,
       });
 
       const imgWidth = 210;
       const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
+      const topMarginMM = 10;
+      const canvasPxPerMM = canvas.width / imgWidth;
+      const pageHeightPx = pageHeight * canvasPxPerMM;
+      const topMarginPx = topMarginMM * canvasPxPerMM;
+
+      // Never let a page break fall in the middle of a table row: collect
+      // every <tr>'s bottom edge (in canvas px) as the only allowed break
+      // points, so each page always ends exactly between two rows.
+      const containerTop = printRef.current.getBoundingClientRect().top;
+      const rowBoundariesPx = Array.from(
+        printRef.current.querySelectorAll("tr")
+      )
+        .map((row) => (row.getBoundingClientRect().bottom - containerTop) * SCALE)
+        .filter((y) => y > 0 && y <= canvas.height)
+        .sort((a, b) => a - b);
+
+      // Capture the column-header row once so it can be re-drawn at the top
+      // of every page after the first (page 1 already has it in place).
+      const theadRow = printRef.current.querySelector("thead tr");
+      let headerCanvas: HTMLCanvasElement | null = null;
+      let headerHeightPx = 0;
+      if (theadRow) {
+        const rect = theadRow.getBoundingClientRect();
+        const headerTopPx = (rect.top - containerTop) * SCALE;
+        headerHeightPx = Math.round((rect.bottom - containerTop) * SCALE - headerTopPx);
+        if (headerHeightPx > 0) {
+          headerCanvas = document.createElement("canvas");
+          headerCanvas.width = canvas.width;
+          headerCanvas.height = headerHeightPx;
+          headerCanvas
+            .getContext("2d")
+            ?.drawImage(
+              canvas,
+              0,
+              headerTopPx,
+              canvas.width,
+              headerHeightPx,
+              0,
+              0,
+              canvas.width,
+              headerHeightPx
+            );
+        }
+      }
 
       const pdf = new JsPDF("p", "mm", "a4");
-      const imgData = canvas.toDataURL("image/png");
+      let cursor = 0;
+      let firstPage = true;
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      while (cursor < canvas.height) {
+        const repeatHeader = !firstPage && headerCanvas !== null;
+        const pageTopMarginPx = firstPage ? 0 : topMarginPx;
+        const availableBodyPx =
+          pageHeightPx - pageTopMarginPx - (repeatHeader ? headerHeightPx : 0);
+        const idealBottom = Math.min(cursor + availableBodyPx, canvas.height);
+        const candidates = rowBoundariesPx.filter(
+          (y) => y > cursor && y <= idealBottom
+        );
+        const sliceBottom =
+          candidates.length > 0
+            ? candidates[candidates.length - 1]
+            : idealBottom;
+        const bodyHeight = Math.max(1, Math.round(sliceBottom - cursor));
+        const pageCanvasHeight = bodyHeight + (repeatHeader ? headerHeightPx : 0);
 
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = pageCanvasHeight;
+        const ctx = pageCanvas.getContext("2d");
+        // JPEG has no alpha channel, so any untouched pixel would otherwise
+        // encode as black — fill white first as a safety net.
+        if (ctx) {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        }
+        let destY = 0;
+        if (repeatHeader && headerCanvas) {
+          ctx?.drawImage(headerCanvas, 0, 0);
+          destY = headerHeightPx;
+        }
+        ctx?.drawImage(
+          canvas,
+          0,
+          cursor,
+          canvas.width,
+          bodyHeight,
+          0,
+          destY,
+          canvas.width,
+          bodyHeight
+        );
+
+        if (!firstPage) pdf.addPage();
+        firstPage = false;
+        pdf.addImage(
+          pageCanvas.toDataURL("image/jpeg", 0.95),
+          "JPEG",
+          0,
+          pageTopMarginPx / canvasPxPerMM,
+          imgWidth,
+          pageCanvasHeight / canvasPxPerMM
+        );
+
+        cursor = sliceBottom;
       }
 
       pdf.save(fileName);
