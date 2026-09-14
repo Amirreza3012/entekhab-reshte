@@ -266,6 +266,38 @@ export function PdfExportButton({
               </tbody>
             </table>
           </div>
+
+          <div
+            style={{
+              marginTop: "20px",
+              borderRadius: "10px",
+              border: "1px solid #e2e8f0",
+              background: "#f8fafc",
+              padding: "16px 18px",
+            }}
+          >
+            <p style={{ fontSize: "11px", lineHeight: 1.9, color: "#334155", margin: 0 }}>
+              ۱. انتخاب رشته فوق در صورت اعمال تغییرات توصیه شده مورد تایید خواهد بود.
+            </p>
+            <p style={{ fontSize: "11px", lineHeight: 1.9, color: "#334155", margin: 0 }}>
+              ۲. نظر مشاور صرفا جنبه پیشنهادی دارد و انتخاب نهایی به عهده شماست.
+            </p>
+
+            <div style={{ display: "flex", gap: "24px", marginTop: "28px" }}>
+              <div style={{ flex: 1, textAlign: "center" }}>
+                <div style={{ height: "48px", borderBottom: "1px solid #94a3b8" }} />
+                <p style={{ marginTop: "8px", fontSize: "11px", fontWeight: 600, color: "#475569" }}>
+                  امضای داوطلب
+                </p>
+              </div>
+              <div style={{ flex: 1, textAlign: "center" }}>
+                <div style={{ height: "48px", borderBottom: "1px solid #94a3b8" }} />
+                <p style={{ marginTop: "8px", fontSize: "11px", fontWeight: 600, color: "#475569" }}>
+                  امضای همراه
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>, portalTarget)}
     </>
