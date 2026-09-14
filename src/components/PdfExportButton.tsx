@@ -77,6 +77,10 @@ export function PdfExportButton({
         .map((row) => (row.getBoundingClientRect().bottom - containerTop) * SCALE)
         .filter((y) => y > 0 && y <= canvas.height)
         .sort((a, b) => a - b);
+      // The last row boundary marks where the choices table ends — anything
+      // captured after it (the notes/signature box) is on its own and
+      // shouldn't get the table header repeated above it.
+      const tableEndPx = rowBoundariesPx[rowBoundariesPx.length - 1] ?? 0;
 
       // Capture the column-header row once so it can be re-drawn at the top
       // of every page after the first (page 1 already has it in place).
@@ -112,7 +116,7 @@ export function PdfExportButton({
       let firstPage = true;
 
       while (cursor < canvas.height) {
-        const repeatHeader = !firstPage && headerCanvas !== null;
+        const repeatHeader = !firstPage && headerCanvas !== null && cursor < tableEndPx;
         const pageTopMarginPx = firstPage ? 0 : topMarginPx;
         const availableBodyPx =
           pageHeightPx - pageTopMarginPx - (repeatHeader ? headerHeightPx : 0);
@@ -276,6 +280,9 @@ export function PdfExportButton({
               padding: "16px 18px",
             }}
           >
+            <p style={{ fontSize: "13px", fontWeight: 700, color: "#111827", margin: "0 0 10px 0" }}>
+              توضیحات
+            </p>
             <p style={{ fontSize: "11px", lineHeight: 1.9, color: "#334155", margin: 0 }}>
               ۱. انتخاب رشته فوق در صورت اعمال تغییرات توصیه شده مورد تایید خواهد بود.
             </p>
