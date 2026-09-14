@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, BarChart3, Check, MoveUp, Search, Sparkles } from "lucide-react";
+import { ArrowLeft, BarChart3, Check, MoveUp, Phone, Search, Sparkles } from "lucide-react";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ROLE_HOME } from "@/lib/roles";
@@ -32,6 +32,24 @@ export default async function Home() {
             <Link href="/login" className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-[#5b5cf0] px-7 py-4 text-sm font-black shadow-2xl shadow-violet-950/40 transition hover:-translate-y-1 hover:bg-[#6b6cf5] sm:w-auto">شروع انتخاب رشته <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" /></Link>
             <span className="flex items-center gap-2 text-xs text-white/40"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10"><Check className="h-3.5 w-3.5 text-[#dfff4f]" /></span> ویژه اعضای مجموعه باورنو</span>
           </div>
+          <section aria-labelledby="contact-heading" className="mt-8 rounded-3xl border border-white/10 bg-white/[.04] p-5 text-right sm:p-6">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#dfff4f]/10 text-[#dfff4f]"><Phone aria-hidden="true" className="h-5 w-5" /></span>
+              <h2 id="contact-heading" className="text-sm font-extrabold">برای شروع، با باورنو تماس بگیر</h2>
+            </div>
+            <p className="mt-3 text-xs leading-6 text-white/60">برای دریافت راهنمایی و عضویت در مجموعه، روی یکی از شماره‌های زیر بزن.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {[
+                { number: "01332130017", href: "tel:+981332130017", label: "تلفن مجموعه" },
+                { number: "09115510043", href: "tel:+989115510043", label: "تلفن همراه" },
+              ].map(({ number, href, label }) => (
+                <a key={number} href={href} aria-label={`تماس با مجموعه باورنو: ${number}`} className="group flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[.05] px-4 py-3 transition hover:border-[#dfff4f]/40 hover:bg-[#dfff4f]/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#dfff4f]">
+                  <span className="min-w-0"><span className="block text-[10px] text-white/50">{label}</span><span dir="ltr" className="mt-1 block text-lg font-bold tabular-nums text-white">{number}</span></span>
+                  <Phone aria-hidden="true" className="h-4 w-4 shrink-0 text-[#dfff4f] transition group-hover:-rotate-12" />
+                </a>
+              ))}
+            </div>
+          </section>
         </div>
 
         <div className="relative mx-auto w-full max-w-xl lg:mx-0">
