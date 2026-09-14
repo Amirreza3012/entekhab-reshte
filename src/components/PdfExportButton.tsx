@@ -82,6 +82,21 @@ export function PdfExportButton({
       // shouldn't get the table header repeated above it.
       const tableEndPx = rowBoundariesPx[rowBoundariesPx.length - 1] ?? 0;
 
+      // The notes box has no rows of its own, so without its bottom edge as
+      // an allowed break point, a page would always end at the table's last
+      // row even when there's enough leftover room to fit the box too —
+      // pushing it to its own page unnecessarily.
+      const breakPointsPx = [...rowBoundariesPx];
+      const notesEl = printRef.current.querySelector("[data-pdf-notes]");
+      if (notesEl) {
+        const notesBottomPx =
+          (notesEl.getBoundingClientRect().bottom - containerTop) * SCALE;
+        if (notesBottomPx > 0 && notesBottomPx <= canvas.height) {
+          breakPointsPx.push(notesBottomPx);
+        }
+      }
+      breakPointsPx.sort((a, b) => a - b);
+
       // Capture the column-header row once so it can be re-drawn at the top
       // of every page after the first (page 1 already has it in place).
       const theadRow = printRef.current.querySelector("thead tr");
@@ -121,7 +136,7 @@ export function PdfExportButton({
         const availableBodyPx =
           pageHeightPx - pageTopMarginPx - (repeatHeader ? headerHeightPx : 0);
         const idealBottom = Math.min(cursor + availableBodyPx, canvas.height);
-        const candidates = rowBoundariesPx.filter(
+        const candidates = breakPointsPx.filter(
           (y) => y > cursor && y <= idealBottom
         );
         const sliceBottom =
@@ -272,6 +287,7 @@ export function PdfExportButton({
           </div>
 
           <div
+            data-pdf-notes="true"
             style={{
               marginTop: "20px",
               borderRadius: "10px",
