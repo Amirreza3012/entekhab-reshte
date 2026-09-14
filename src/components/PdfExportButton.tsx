@@ -96,6 +96,14 @@ export function PdfExportButton({
         }
       }
       breakPointsPx.sort((a, b) => a - b);
+      // The captured canvas includes the container's own bottom padding
+      // below the last real content, which would otherwise trigger one
+      // extra, nearly-blank trailing page — stop at the last real element
+      // instead of the raw canvas height.
+      const contentEndPx =
+        breakPointsPx.length > 0
+          ? breakPointsPx[breakPointsPx.length - 1]
+          : canvas.height;
 
       // Capture the column-header row once so it can be re-drawn at the top
       // of every page after the first (page 1 already has it in place).
@@ -130,12 +138,12 @@ export function PdfExportButton({
       let cursor = 0;
       let firstPage = true;
 
-      while (cursor < canvas.height) {
+      while (cursor < contentEndPx) {
         const repeatHeader = !firstPage && headerCanvas !== null && cursor < tableEndPx;
         const pageTopMarginPx = firstPage ? 0 : topMarginPx;
         const availableBodyPx =
           pageHeightPx - pageTopMarginPx - (repeatHeader ? headerHeightPx : 0);
-        const idealBottom = Math.min(cursor + availableBodyPx, canvas.height);
+        const idealBottom = Math.min(cursor + availableBodyPx, contentEndPx);
         const candidates = breakPointsPx.filter(
           (y) => y > cursor && y <= idealBottom
         );
