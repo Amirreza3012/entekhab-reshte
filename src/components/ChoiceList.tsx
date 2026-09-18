@@ -30,13 +30,14 @@ export function ChoiceList({
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-white bg-white/90 shadow-sm shadow-slate-200/70">
-      <table className="w-full min-w-[800px] text-sm">
+    <div className="min-w-0 max-w-full overflow-x-auto rounded-2xl border border-white bg-white/90 shadow-sm shadow-slate-200/70">
+      <table className="w-full min-w-[960px] text-sm">
         <thead className="bg-slate-50/80 text-xs text-slate-500">
           <tr className="text-right">
             <th className="w-14 px-3 py-2 font-medium">رتبه</th>
             <th className="px-3 py-2 font-medium">رشته</th>
             <th className="px-3 py-2 font-medium">استان / دانشگاه</th>
+            <th className="whitespace-nowrap px-3 py-2 font-medium">دوره تحصیلی</th>
             <th className="px-3 py-2 font-medium">کدرشته‌محل</th>
             {!readOnly && <th className="px-3 py-2 font-medium"></th>}
           </tr>
@@ -60,6 +61,9 @@ export function ChoiceList({
                 <div className="text-xs text-slate-500">
                   {choice.major.university}
                 </div>
+              </td>
+              <td className="whitespace-nowrap px-3 py-3 text-slate-700">
+                {choice.major.studyPeriod || "—"}
               </td>
               <td className="px-3 py-3 text-right text-slate-700" dir="ltr">
                 {toPersianDigits(choice.major.majorCode)}
