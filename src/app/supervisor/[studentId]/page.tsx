@@ -6,9 +6,7 @@ import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { BackLink } from "@/components/BackLink";
 import { ChoiceList } from "@/components/ChoiceList";
 import { PdfExportButton } from "@/components/PdfExportButton";
-import { DragReorderPanel } from "@/components/DragReorderPanel";
 import {
-  moveChoiceForAdminAction,
   removeChoiceForAdminAction,
   reorderChoicesForAdminAction,
 } from "@/app/admin/actions";
@@ -50,22 +48,16 @@ export default async function SupervisorStudentActivityPage({
         />
       </div>
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+      <div className="min-w-0 w-full">
         <div className="min-w-0 flex-1">
           <ChoiceList
             choices={choices}
-            moveAction={moveChoiceForAdminAction}
+            studentId={studentId}
+            reorderAction={reorderChoicesForAdminAction}
             removeAction={removeChoiceForAdminAction}
             extraHiddenFields={{ studentId }}
           />
         </div>
-        <DragReorderPanel
-          studentId={studentId}
-          choices={choices}
-          reorderAction={reorderChoicesForAdminAction}
-          removeAction={removeChoiceForAdminAction}
-          extraHiddenFields={{ studentId }}
-        />
       </div>
     </div>
   );

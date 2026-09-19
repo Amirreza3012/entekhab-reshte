@@ -1,0 +1,30 @@
+.row { background: #fff; }
+.row:hover { background: #f8f7ff; }
+.row.row[data-dragging], .row.row:has(.handle:active) {
+  background: #e4e5ef;
+  box-shadow: inset 3px 0 #7c6cf0, 0 8px 24px #11182718;
+}
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 44px;
+  border-radius: 12px;
+  color: #94a3b8;
+  cursor: grab;
+  touch-action: none;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.handle:hover { background: #ede9fe; color: #6d28d9; }
+.handle:focus-visible { outline: 2px solid #7c6cf0; outline-offset: 2px; }
+.row[data-dragging] .handle, .handle:active {
+  background: #5b5cf0;
+  color: #fff;
+  transform: scale(1.08) rotate(-8deg);
+  cursor: grabbing;
+}
+.handle:disabled { opacity: .35; cursor: wait; }
+@media (prefers-reduced-motion: reduce) {
+  .row, .handle { transition: none !important; }
+}
