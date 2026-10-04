@@ -5,7 +5,8 @@ import { z } from "zod";
 import { requireRole } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
-import { Role } from "@/generated/prisma/client";
+import { Prisma, Role } from "@/generated/prisma/client";
+import { parseNationalId } from "@/lib/nationalId";
 import {
   moveChoice,
   removeChoice,
@@ -19,6 +20,16 @@ import {
 } from "@/lib/bulkUsers";
 
 export type ActionResult = { error?: string; success?: string };
+
+// Race-safe fallback for the unique indexes (the pre-checks above give the
+// friendlier message with the owner's name).
+function uniqueConflictMessage(error: unknown): string | null {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") return null;
+  const target = JSON.stringify(error.meta ?? {});
+  if (target.includes("nationalId")) return "این کد ملی قبلاً برای کاربر دیگری ثبت شده است.";
+  if (target.includes("email")) return "کاربری با این ایمیل قبلاً ثبت شده است.";
+  return "اطلاعات تکراری است.";
+}
 
 const createUserSchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ حرف باشد."),
@@ -44,6 +55,9 @@ export async function createUserAction(
     return { error: parsed.error.issues[0]?.message ?? "اطلاعات نامعتبر است." };
   }
 
+  const nationalId = parseNationalId(formData.get("nationalId"));
+  if (!nationalId.ok) return { error: nationalId.message };
+
   const existing = await prisma.user.findUnique({
     where: { email: parsed.data.email },
   });
@@ -51,16 +65,28 @@ export async function createUserAction(
     return { error: "کاربری با این ایمیل قبلاً ثبت شده است." };
   }
 
+  if (nationalId.value) {
+    const owner = await prisma.user.findUnique({ where: { nationalId: nationalId.value } });
+    if (owner) return { error: `این کد ملی قبلاً برای «${owner.name}» ثبت شده است.` };
+  }
+
   const passwordHash = await hashPassword(parsed.data.password);
 
-  await prisma.user.create({
-    data: {
-      name: parsed.data.name,
-      email: parsed.data.email,
-      passwordHash,
-      role: parsed.data.role as Role,
-    },
-  });
+  try {
+    await prisma.user.create({
+      data: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        passwordHash,
+        role: parsed.data.role as Role,
+        nationalId: nationalId.value,
+      },
+    });
+  } catch (error) {
+    const conflict = uniqueConflictMessage(error);
+    if (conflict) return { error: conflict };
+    throw error;
+  }
 
   revalidatePath("/admin/users");
   return { success: "کاربر با موفقیت ایجاد شد." };
@@ -97,9 +123,19 @@ export async function updateUserAction(
 
   const { userId, name, email, role } = parsed.data;
 
+  const nationalId = parseNationalId(formData.get("nationalId"));
+  if (!nationalId.ok) return { error: nationalId.message };
+
   const emailOwner = await prisma.user.findUnique({ where: { email } });
   if (emailOwner && emailOwner.id !== userId) {
     return { error: "کاربر دیگری با این ایمیل ثبت شده است." };
+  }
+
+  if (nationalId.value) {
+    const idOwner = await prisma.user.findUnique({ where: { nationalId: nationalId.value } });
+    if (idOwner && idOwner.id !== userId) {
+      return { error: `این کد ملی قبلاً برای «${idOwner.name}» ثبت شده است.` };
+    }
   }
 
   const target = await prisma.user.findUnique({ where: { id: userId } });
@@ -107,24 +143,31 @@ export async function updateUserAction(
     return { error: "کاربر یافت نشد." };
   }
 
-  await prisma.$transaction(async (tx) => {
-    if (target.role === Role.MENTOR && role !== "MENTOR") {
-      await tx.user.updateMany({
-        where: { mentorId: userId },
-        data: { mentorId: null },
-      });
-    }
+  try {
+    await prisma.$transaction(async (tx) => {
+      if (target.role === Role.MENTOR && role !== "MENTOR") {
+        await tx.user.updateMany({
+          where: { mentorId: userId },
+          data: { mentorId: null },
+        });
+      }
 
-    await tx.user.update({
-      where: { id: userId },
-      data: {
-        name,
-        email,
-        role: role as Role,
-        ...(rawPassword ? { passwordHash: await hashPassword(rawPassword) } : {}),
-      },
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          name,
+          email,
+          role: role as Role,
+          nationalId: nationalId.value,
+          ...(rawPassword ? { passwordHash: await hashPassword(rawPassword) } : {}),
+        },
+      });
     });
-  });
+  } catch (error) {
+    const conflict = uniqueConflictMessage(error);
+    if (conflict) return { error: conflict };
+    throw error;
+  }
 
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);

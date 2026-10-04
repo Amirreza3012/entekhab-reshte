@@ -18,6 +18,7 @@ export function CreateUserForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nationalId, setNationalId] = useState("");
   const [role, setRole] = useState("STUDENT");
 
   // Reset fields on a successful submission (but not on error) using React's
@@ -29,6 +30,7 @@ export function CreateUserForm() {
       setName("");
       setEmail("");
       setPassword("");
+      setNationalId("");
       setRole("STUDENT");
     }
   }
@@ -67,6 +69,16 @@ export function CreateUserForm() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+      />
+      <input
+        name="nationalId"
+        placeholder="کد ملی (اختیاری)"
+        inputMode="numeric"
+        dir="ltr"
+        maxLength={10}
+        value={nationalId}
+        onChange={(e) => setNationalId(e.target.value)}
+        className="rounded-lg border border-slate-300 px-3 py-2 text-left text-sm outline-none focus:border-slate-500"
       />
       <NativeSelect
         name="role"

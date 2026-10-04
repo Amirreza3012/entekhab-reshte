@@ -14,6 +14,7 @@ export async function GET() {
     { header: "ایمیل", key: "email", width: 30 },
     { header: "رمز عبور", key: "password", width: 20 },
     { header: "نقش", key: "role", width: 16 },
+    { header: "کد ملی", key: "nationalId", width: 16 }, // اختیاری؛ ۱۰ رقم
   ];
   sheet.getRow(1).font = { bold: true };
 
@@ -22,6 +23,7 @@ export async function GET() {
     email: "student.sample@example.com",
     password: "Passw0rd!",
     role: "دانش‌آموز",
+    nationalId: "",
   });
 
   const buffer = await workbook.xlsx.writeBuffer();

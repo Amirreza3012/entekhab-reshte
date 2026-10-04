@@ -14,11 +14,13 @@ export function EditUserForm({
   defaultName,
   defaultEmail,
   defaultRole,
+  defaultNationalId,
 }: {
   userId: string;
   defaultName: string;
   defaultEmail: string;
   defaultRole: "ADMIN" | "SUPERVISOR" | "MENTOR" | "STUDENT";
+  defaultNationalId: string | null;
 }) {
   const [state, formAction, pending] = useActionState(
     updateUserAction,
@@ -28,6 +30,7 @@ export function EditUserForm({
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState(defaultEmail);
   const [role, setRole] = useState(defaultRole);
+  const [nationalId, setNationalId] = useState(defaultNationalId ?? "");
   const [password, setPassword] = useState("");
 
   // Clear the password field on a successful save, using React's "adjust
@@ -73,6 +76,20 @@ export function EditUserForm({
             onChange={(e) => setEmail(e.target.value)}
             required
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-slate-700">کد ملی (اختیاری)</label>
+          <input
+            name="nationalId"
+            value={nationalId}
+            onChange={(e) => setNationalId(e.target.value)}
+            inputMode="numeric"
+            dir="ltr"
+            maxLength={10}
+            placeholder="۱۰ رقم"
+            className="rounded-lg border border-slate-300 px-3 py-2 text-left text-sm outline-none focus:border-slate-500"
           />
         </div>
 

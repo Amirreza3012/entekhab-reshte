@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
 import { Role } from "@/generated/prisma/client";
+import { parseNationalId } from "@/lib/nationalId";
 
 export type BulkRowError = { row: number; message: string };
 
@@ -12,6 +13,7 @@ export type ParsedUserRow = {
   email: string;
   password: string;
   role: Role;
+  nationalId: string | null;
 };
 
 const ROLE_VALUE_MAP: Record<string, Role> = {
@@ -42,9 +44,12 @@ const HEADER_ALIASES = {
   email: ["ایمیل"],
   password: ["رمز عبور"],
   role: ["نقش"],
+  nationalId: ["کد ملی", "کدملی"],
 } as const;
 
 type ColumnKey = keyof typeof HEADER_ALIASES;
+// «کد ملی» is optional; every other column is required.
+const OPTIONAL_COLUMNS: ColumnKey[] = ["nationalId"];
 
 // Excel auto-converts things like typed email addresses into hyperlink
 // objects, and formula cells expose their value as { formula, result }, so a
@@ -85,6 +90,7 @@ export async function parseUsersWorkbook(
     email: 0,
     password: 0,
     role: 0,
+    nationalId: 0,
   };
 
   sheet.getRow(1).eachCell((cell, colNumber) => {
@@ -97,7 +103,7 @@ export async function parseUsersWorkbook(
   });
 
   const missingColumns = (Object.keys(columnIndex) as ColumnKey[]).filter(
-    (key) => columnIndex[key] === 0
+    (key) => columnIndex[key] === 0 && !OPTIONAL_COLUMNS.includes(key)
   );
   if (missingColumns.length > 0) {
     return {
@@ -124,8 +130,9 @@ export async function parseUsersWorkbook(
     const email = cellText(columnIndex.email);
     const password = cellText(columnIndex.password);
     const roleRaw = cellText(columnIndex.role);
+    const nationalIdRaw = columnIndex.nationalId ? cellText(columnIndex.nationalId) : "";
 
-    if (!name && !email && !password && !roleRaw) return;
+    if (!name && !email && !password && !roleRaw && !nationalIdRaw) return;
 
     const parsed = rowSchema.safeParse({ name, email, password });
     if (!parsed.success) {
@@ -145,7 +152,16 @@ export async function parseUsersWorkbook(
       return;
     }
 
-    rows.push({ row: rowNumber, ...parsed.data, role });
+    const nationalId = parseNationalId(nationalIdRaw);
+    if (!nationalId.ok) {
+      errors.push({
+        row: rowNumber,
+        message: `کد ملی «${nationalIdRaw}» نامعتبر است: باید دقیقاً ۱۰ رقم باشد.`,
+      });
+      return;
+    }
+
+    rows.push({ row: rowNumber, ...parsed.data, role, nationalId: nationalId.value });
   });
 
   return { rows, errors };
@@ -172,6 +188,21 @@ export async function createUsersFromRows(
     deduped.push(row);
   }
 
+  const seenNationalIds = new Map<string, number>();
+  for (const row of [...deduped]) {
+    if (!row.nationalId) continue;
+    const firstRow = seenNationalIds.get(row.nationalId);
+    if (firstRow) {
+      errors.push({
+        row: row.row,
+        message: `کد ملی تکراری در فایل (مشابه سطر ${firstRow}).`,
+      });
+      deduped.splice(deduped.indexOf(row), 1);
+      continue;
+    }
+    seenNationalIds.set(row.nationalId, row.row);
+  }
+
   if (deduped.length === 0) {
     return { created: 0, errors };
   }
@@ -182,11 +213,28 @@ export async function createUsersFromRows(
   });
   const existingEmails = new Set(existing.map((u) => u.email.toLowerCase()));
 
+  const existingByNationalId = new Map(
+    (
+      await prisma.user.findMany({
+        where: { nationalId: { in: deduped.flatMap((row) => (row.nationalId ? [row.nationalId] : [])) } },
+        select: { nationalId: true, name: true },
+      })
+    ).map((u) => [u.nationalId, u.name])
+  );
+
   const toCreate = deduped.filter((row) => {
     if (existingEmails.has(row.email.toLowerCase())) {
       errors.push({
         row: row.row,
         message: "کاربری با این ایمیل قبلاً ثبت شده است.",
+      });
+      return false;
+    }
+    const idOwner = row.nationalId ? existingByNationalId.get(row.nationalId) : undefined;
+    if (idOwner) {
+      errors.push({
+        row: row.row,
+        message: `این کد ملی قبلاً برای «${idOwner}» ثبت شده است.`,
       });
       return false;
     }
@@ -203,6 +251,7 @@ export async function createUsersFromRows(
       email: row.email,
       passwordHash: await hashPassword(row.password),
       role: row.role,
+      nationalId: row.nationalId,
     }))
   );
 

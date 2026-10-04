@@ -38,6 +38,7 @@ export default async function AdminEditUserPage({
         defaultName={user.name}
         defaultEmail={user.email}
         defaultRole={user.role}
+        defaultNationalId={user.nationalId}
       />
     </div>
   );

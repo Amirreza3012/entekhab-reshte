@@ -53,7 +53,7 @@ model User {
   passwordHash String
   name         String
   role         Role
-  nationalId   String?
+  nationalId   String?  @unique
   phone        String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
