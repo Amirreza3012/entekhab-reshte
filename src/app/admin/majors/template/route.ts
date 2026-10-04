@@ -21,6 +21,9 @@ export async function GET() {
     { header: "نیمسال", key: "termType", width: 12 },
     { header: "جنسیت", key: "gender", width: 10 },
     { header: "توضیحات", key: "description", width: 30 },
+    { header: "سال ورود", key: "entryYear", width: 10 }, // اختیاری؛ برای ورودی مهر ۱۴۰۶: 1406
+    { header: "نوع پذیرش", key: "admissionType", width: 18 }, // عادی / تعهد خدمت / تعهد بومی استان / فرهنگیان
+    { header: "نحوه پذیرش", key: "admissionMethod", width: 22 }, // با آزمون / صرفا با سوابق تحصیلی
   ];
   sheet.getRow(1).font = { bold: true };
 
@@ -36,6 +39,8 @@ export async function GET() {
     termType: "اول",
     gender: "مرد",
     description: "",
+    admissionType: "عادی",
+    admissionMethod: "با آزمون",
   });
   sheet.addRow({
     examYear: 1404,
@@ -49,6 +54,8 @@ export async function GET() {
     termType: "اول",
     gender: "زن",
     description: "",
+    admissionType: "عادی",
+    admissionMethod: "با آزمون",
   });
 
   const buffer = await workbook.xlsx.writeBuffer();

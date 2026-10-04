@@ -17,6 +17,9 @@ type SearchParams = {
   province?: string;
   studyPeriod?: string;
   gender?: string;
+  entryYear?: string;
+  admissionType?: string;
+  admissionMethod?: string;
   page?: string;
 };
 
@@ -29,13 +32,24 @@ export default async function StudentSearchPage({
   const sp = await searchParams;
 
   const [options, results, currentChoices] = await Promise.all([
-    getMajorFilterOptions(),
+    getMajorFilterOptions({
+      fieldGroup: sp.fieldGroup,
+      province: sp.province,
+      studyPeriod: sp.studyPeriod,
+      gender: sp.gender,
+      entryYear: sp.entryYear,
+      admissionType: sp.admissionType,
+      admissionMethod: sp.admissionMethod,
+    }),
     searchMajors({
       q: sp.q,
       fieldGroup: sp.fieldGroup,
       province: sp.province,
       studyPeriod: sp.studyPeriod,
       gender: sp.gender,
+      entryYear: sp.entryYear,
+      admissionType: sp.admissionType,
+      admissionMethod: sp.admissionMethod,
       page: sp.page ? Number(sp.page) : 1,
     }),
     getStudentChoices(user.id),
@@ -53,6 +67,9 @@ export default async function StudentSearchPage({
     if (sp.province) params.set("province", sp.province);
     if (sp.studyPeriod) params.set("studyPeriod", sp.studyPeriod);
     if (sp.gender) params.set("gender", sp.gender);
+    if (sp.entryYear) params.set("entryYear", sp.entryYear);
+    if (sp.admissionType) params.set("admissionType", sp.admissionType);
+    if (sp.admissionMethod) params.set("admissionMethod", sp.admissionMethod);
     params.set("page", String(page));
     return `/student?${params.toString()}`;
   };
@@ -82,6 +99,9 @@ export default async function StudentSearchPage({
           province: sp.province,
           studyPeriod: sp.studyPeriod,
           gender: sp.gender,
+          entryYear: sp.entryYear,
+      admissionType: sp.admissionType,
+      admissionMethod: sp.admissionMethod,
         }}
       />
 

@@ -8,7 +8,9 @@ import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, us
 import { SortableContext, verticalListSortingStrategy, sortableKeyboardCoordinates, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Choice, Major } from "@/generated/prisma/client";
-import { GENDER_LABELS, TERM_LABELS, toPersianDigits } from "@/lib/format";
+import { GENDER_LABELS, TERM_LABELS, majorTint, toPersianDigits, type MajorTint } from "@/lib/format";
+import { MajorBadges } from "@/components/MajorBadges";
+import { MajorTintLegend } from "@/components/MajorTintLegend";
 import styles from "./ChoiceList.module.css";
 
 type ChoiceWithMajor = Choice & { major: Major };
@@ -105,6 +107,8 @@ export function ChoiceList({
   return (
     <DndContext id={id} sensors={sensors} collisionDetection={closestCenter} modifiers={[verticalOnly]} onDragStart={() => setDragging(true)} onDragCancel={() => setDragging(false)} onDragEnd={handleDragEnd}
       accessibility={{ screenReaderInstructions: { draggable: "برای گرفتن ردیف کلید فاصله، برای جابه‌جایی کلیدهای بالا و پایین، برای رهاکردن دوباره فاصله و برای انصراف Escape را بزنید." } }}>
+    <div className="flex min-w-0 max-w-full flex-col gap-3">
+    <MajorTintLegend />
     <div className="min-w-0 max-w-full rounded-2xl border border-white bg-white/90 shadow-sm shadow-slate-200/70">
       {sortable && <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
         <span className="flex items-center gap-2"><GripVertical aria-hidden="true" className="h-4 w-4 text-violet-500" />برای جابه‌جایی، دستگیره‌ی نقطه‌ای کنار ردیف را بگیرید و بکشید.</span>
@@ -128,8 +132,10 @@ export function ChoiceList({
         </thead>
         <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
         <tbody className="divide-y divide-slate-100">
-          {items.map((choice, index) => (
-            <ChoiceRow key={choice.id} choice={choice} sortable={sortable} disabled={pending}>
+          {items.map((choice, index) => {
+            const tint = majorTint(choice.major.admissionType, choice.major.entryYear);
+            return (
+            <ChoiceRow key={choice.id} choice={choice} sortable={sortable} disabled={pending} tint={tint}>
               <td className="px-3 py-3 font-medium text-slate-900">
                 {toPersianDigits(choice.rank)}
               </td>
@@ -137,8 +143,9 @@ export function ChoiceList({
                 <div className="font-medium text-slate-900">
                   {choice.major.title}
                 </div>
-                <div className="text-xs text-slate-500">
-                  {choice.major.fieldGroup}
+                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold leading-5">
+                  <span className="me-1 text-xs font-normal text-slate-500">{choice.major.fieldGroup}</span>
+                  <MajorBadges major={choice.major} />
                 </div>
               </td>
               <td className="min-w-56 px-3 py-3 text-slate-700">
@@ -202,20 +209,23 @@ export function ChoiceList({
                 </td>
               )}
             </ChoiceRow>
-          ))}
+            );
+          })}
         </tbody>
         </SortableContext>
       </table>
       </div>
     </div>
+    </div>
     </DndContext>
   );
 }
 
-function ChoiceRow({ choice, sortable, disabled, children }: {
+function ChoiceRow({ choice, sortable, disabled, tint, children }: {
   choice: ChoiceWithMajor;
   sortable: boolean;
   disabled: boolean;
+  tint: MajorTint;
   children: ReactNode;
 }) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
@@ -223,7 +233,7 @@ function ChoiceRow({ choice, sortable, disabled, children }: {
     disabled: disabled || !sortable,
     transition: { duration: 220, easing: "cubic-bezier(0.2, 0, 0, 1)" },
   });
-  return <tr ref={setNodeRef} data-dragging={isDragging || undefined} className={styles.row}
+  return <tr ref={setNodeRef} data-dragging={isDragging || undefined} className={`${styles.row} ${tint.row} [&[data-dragging]>td]:bg-[#e4e5ef]`}
     style={{ transform: CSS.Translate.toString(transform), transition: [transition, "background-color 180ms ease", "box-shadow 180ms ease"].filter(Boolean).join(", "), position: "relative", zIndex: isDragging ? 10 : undefined }}>
     {sortable && <td className="w-12 px-2 py-3">
       <button ref={setActivatorNodeRef} type="button" {...attributes} {...listeners} disabled={disabled}

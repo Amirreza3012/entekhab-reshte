@@ -29,6 +29,9 @@ type SearchParams = {
   province?: string;
   studyPeriod?: string;
   gender?: string;
+  entryYear?: string;
+  admissionType?: string;
+  admissionMethod?: string;
   page?: string;
   choicesPage?: string;
 };
@@ -47,13 +50,24 @@ export default async function MentorStudentPage({
   const student = await getMenteeOrThrow(mentor.id, studentId);
 
   const [options, results, choices, logs] = await Promise.all([
-    getMajorFilterOptions(),
+    getMajorFilterOptions({
+      fieldGroup: sp.fieldGroup,
+      province: sp.province,
+      studyPeriod: sp.studyPeriod,
+      gender: sp.gender,
+      entryYear: sp.entryYear,
+      admissionType: sp.admissionType,
+      admissionMethod: sp.admissionMethod,
+    }),
     searchMajors({
       q: sp.q,
       fieldGroup: sp.fieldGroup,
       province: sp.province,
       studyPeriod: sp.studyPeriod,
       gender: sp.gender,
+      entryYear: sp.entryYear,
+      admissionType: sp.admissionType,
+      admissionMethod: sp.admissionMethod,
       page: sp.page ? Number(sp.page) : 1,
     }),
     getStudentChoices(studentId),
@@ -83,6 +97,9 @@ export default async function MentorStudentPage({
     if (sp.province) p.set("province", sp.province);
     if (sp.studyPeriod) p.set("studyPeriod", sp.studyPeriod);
     if (sp.gender) p.set("gender", sp.gender);
+    if (sp.entryYear) p.set("entryYear", sp.entryYear);
+    if (sp.admissionType) p.set("admissionType", sp.admissionType);
+    if (sp.admissionMethod) p.set("admissionMethod", sp.admissionMethod);
     p.set("page", String(page));
     return `/mentor/students/${studentId}?${p.toString()}`;
   };
@@ -94,6 +111,9 @@ export default async function MentorStudentPage({
     if (sp.province) p.set("province", sp.province);
     if (sp.studyPeriod) p.set("studyPeriod", sp.studyPeriod);
     if (sp.gender) p.set("gender", sp.gender);
+    if (sp.entryYear) p.set("entryYear", sp.entryYear);
+    if (sp.admissionType) p.set("admissionType", sp.admissionType);
+    if (sp.admissionMethod) p.set("admissionMethod", sp.admissionMethod);
     if (sp.page) p.set("page", sp.page);
     p.set("choicesPage", String(page));
     return `/mentor/students/${studentId}?${p.toString()}`;
@@ -157,6 +177,9 @@ export default async function MentorStudentPage({
             province: sp.province,
             studyPeriod: sp.studyPeriod,
             gender: sp.gender,
+            entryYear: sp.entryYear,
+      admissionType: sp.admissionType,
+      admissionMethod: sp.admissionMethod,
           }}
         />
         <p className="text-sm text-slate-500">

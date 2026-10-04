@@ -5,7 +5,12 @@ import { createPortal } from "react-dom";
 import { FileDown } from "lucide-react";
 import { toast } from "sonner";
 import type { Choice, Major } from "@/generated/prisma/client";
-import { toPersianDigits } from "@/lib/format";
+import {
+  ADMISSION_METHOD_LABELS,
+  ADMISSION_TYPE_LABELS,
+  MEHR_1406_ENTRY_YEAR,
+  toPersianDigits,
+} from "@/lib/format";
 
 type ChoiceWithMajor = Choice & { major: Major };
 const subscribeToClient = () => () => {};
@@ -266,6 +271,7 @@ export function PdfExportButton({
                 <tr style={{ background: "#1e293b" }}>
                   <th style={headerCellStyle}>رتبه</th>
                   <th style={headerCellStyle}>عنوان رشته</th>
+                  <th style={headerCellStyle}>نوع پذیرش</th>
                   <th style={headerCellStyle}>دوره تحصیلی</th>
                   <th style={headerCellStyle}>استان</th>
                   <th style={headerCellStyle}>دانشگاه</th>
@@ -274,13 +280,25 @@ export function PdfExportButton({
               </thead>
               <tbody>
                 {choices.map((choice, index) => {
+                  const tint = typeColors(choice.major.admissionType, choice.major.entryYear);
                   const rowStyle: CSSProperties = {
-                    background: index % 2 === 0 ? "#ffffff" : "#f8fafc",
+                    background: tint.bg ?? (index % 2 === 0 ? "#ffffff" : "#f8fafc"),
                   };
                   return (
                     <tr key={choice.id} style={rowStyle}>
                       <td style={cellStyle}>{toPersianDigits(choice.rank)}</td>
                       <td style={cellStyle}>{choice.major.title}</td>
+                      <td style={cellStyle}>
+                        <div style={noteLineStyle(tint.color)}>
+                          {ADMISSION_TYPE_LABELS[choice.major.admissionType]}
+                        </div>
+                        {choice.major.admissionMethod === "RECORDS_ONLY" && (
+                          <div style={noteLineStyle("#9f1239")}>{ADMISSION_METHOD_LABELS.RECORDS_ONLY}</div>
+                        )}
+                        {choice.major.entryYear === MEHR_1406_ENTRY_YEAR && (
+                          <div style={noteLineStyle("#92400e")}>مهر {toPersianDigits(MEHR_1406_ENTRY_YEAR)}</div>
+                        )}
+                      </td>
                       <td style={cellStyle}>{choice.major.studyPeriod}</td>
                       <td style={cellStyle}>{choice.major.province}</td>
                       <td style={cellStyle}>{choice.major.university}</td>
@@ -350,3 +368,30 @@ const cellStyle: CSSProperties = {
   borderBottom: "1px solid #e2e8f0",
   color: "#1e293b",
 };
+
+// Whole rows are tinted (like the app's tables, without the edge bar) and the type is plain text:
+// html2canvas misplaces Persian text inside bordered inline-block "pills", but
+// renders block text in cells correctly.
+type TypeColors = { bg?: string; color: string };
+
+function typeColors(type: ChoiceWithMajor["major"]["admissionType"], entryYear: number | null): TypeColors {
+  const mehr1406 = entryYear === MEHR_1406_ENTRY_YEAR;
+  switch (type) {
+    case "SERVICE_COMMITMENT":
+      return mehr1406
+        ? { bg: "#eee9ff", color: "#4c1d95" }
+        : { bg: "#e6f0ff", color: "#1e3a8a" };
+    case "NATIVE_COMMITMENT":
+      return { bg: "#def5eb", color: "#064e3b" };
+    case "FARHANGIAN":
+      return { bg: "#fae5f4", color: "#701a75" };
+    default:
+      return mehr1406
+        ? { bg: "#fff4d6", color: "#78350f" }
+        : { color: "#475569" };
+  }
+}
+
+function noteLineStyle(color: string): CSSProperties {
+  return { color, fontSize: "10.5px", fontWeight: 700, lineHeight: 1.8 };
+}

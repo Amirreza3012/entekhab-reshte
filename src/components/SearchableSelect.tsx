@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { ChevronDown } from "lucide-react";
 
 export function SearchableSelect({
@@ -8,11 +9,13 @@ export function SearchableSelect({
   options,
   placeholder,
   defaultValue,
+  onValueChange,
 }: {
   name: string;
   options: string[];
   placeholder: string;
   defaultValue?: string;
+  onValueChange?: () => void;
 }) {
   const [value, setValue] = useState(defaultValue ?? "");
   const [query, setQuery] = useState(defaultValue ?? "");
@@ -38,16 +41,24 @@ export function SearchableSelect({
     return options.filter((o) => o.toLowerCase().includes(query.toLowerCase()));
   }, [options, query]);
 
+  // flushSync so the hidden input already holds the new value when the
+  // parent reacts (e.g. submits the filter form).
   function select(option: string) {
-    setValue(option);
-    setQuery(option);
-    setOpen(false);
+    flushSync(() => {
+      setValue(option);
+      setQuery(option);
+      setOpen(false);
+    });
+    onValueChange?.();
   }
 
   function clear() {
-    setValue("");
-    setQuery("");
-    setOpen(false);
+    flushSync(() => {
+      setValue("");
+      setQuery("");
+      setOpen(false);
+    });
+    onValueChange?.();
   }
 
   return (

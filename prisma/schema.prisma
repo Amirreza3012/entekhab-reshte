@@ -26,6 +26,20 @@ enum TermType {
   UNSPECIFIED
 }
 
+// نوع پذیرش: REGULAR = ordinary entry; the rest are the booklet's special parts.
+enum AdmissionType {
+  REGULAR
+  SERVICE_COMMITMENT
+  NATIVE_COMMITMENT
+  FARHANGIAN
+}
+
+// نحوه پذیرش column of the booklet: with the konkur exam, or by academic record only.
+enum AdmissionMethod {
+  WITH_EXAM
+  RECORDS_ONLY
+}
+
 enum MentorAction {
   ADD_CHOICE
   REMOVE_CHOICE
@@ -49,7 +63,7 @@ model User {
   mentor   User?   @relation("MentorStudents", fields: [mentorId], references: [id])
   mentees  User[]  @relation("MentorStudents")
 
-  choices           Choice[]
+  choices             Choice[]
   mentorLogsAsMentor  MentorLog[] @relation("MentorLogsAsMentor")
   mentorLogsAsStudent MentorLog[] @relation("MentorLogsAsStudent")
 
@@ -58,20 +72,24 @@ model User {
 }
 
 model Major {
-  id          String    @id @default(cuid())
-  examYear    Int       @default(1404)
-  fieldGroup  String
-  province    String
-  university  String
-  studyPeriod String
-  majorCode   String
-  title       String
-  capacity    Int?
-  termType    TermType  @default(UNSPECIFIED)
-  gender      Gender    @default(BOTH)
-  description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id              String          @id @default(cuid())
+  examYear        Int             @default(1404)
+  fieldGroup      String
+  province        String
+  university      String
+  studyPeriod     String
+  majorCode       String
+  title           String
+  capacity        Int?
+  termType        TermType        @default(UNSPECIFIED)
+  gender          Gender          @default(BOTH)
+  description     String?
+  // null = regular entry for examYear; 1406 = «نیمسال اول (مهرماه) سال ۱۴۰۶».
+  entryYear       Int?
+  admissionType   AdmissionType   @default(REGULAR)
+  admissionMethod AdmissionMethod @default(WITH_EXAM)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   choices Choice[]
 
@@ -82,6 +100,9 @@ model Major {
   @@index([studyPeriod])
   @@index([gender])
   @@index([title])
+  @@index([entryYear])
+  @@index([admissionType])
+  @@index([admissionMethod])
 }
 
 model Choice {
