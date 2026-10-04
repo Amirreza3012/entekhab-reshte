@@ -1,5 +1,6 @@
 "use client";
 
+import { NativeSelect } from "@/components/NativeSelect";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
@@ -67,17 +68,16 @@ export function CreateUserForm() {
         onChange={(e) => setPassword(e.target.value)}
         className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
       />
-      <select
+      <NativeSelect
         name="role"
         value={role}
         onChange={(e) => setRole(e.target.value)}
-        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
       >
         <option value="STUDENT">دانش‌آموز</option>
         <option value="MENTOR">منتور</option>
         <option value="SUPERVISOR">ناظر</option>
         <option value="ADMIN">ادمین</option>
-      </select>
+      </NativeSelect>
 
       <button
         type="submit"

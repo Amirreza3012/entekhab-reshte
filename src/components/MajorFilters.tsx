@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { ChevronDown, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
+import { NativeSelect } from "@/components/NativeSelect";
 import { SearchableSelect } from "@/components/SearchableSelect";
 import { ADMISSION_METHOD_FILTER_OPTIONS, ADMISSION_TYPE_FILTER_OPTIONS, ENTRY_FILTER_OPTIONS } from "@/lib/format";
 
@@ -151,23 +152,5 @@ export function MajorFilters({
         بازنشانی فیلترها
       </button>
     </form>
-  );
-}
-
-// Native <select> with the same chevron placement/size as SearchableSelect.
-function NativeSelect({
-  children,
-  ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <div className="relative">
-      <select
-        {...props}
-        className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 pl-8 text-sm outline-none"
-      >
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-    </div>
   );
 }

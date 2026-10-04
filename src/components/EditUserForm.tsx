@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 import { PasswordInput } from "@/components/PasswordInput";
+import { NativeSelect } from "@/components/NativeSelect";
 import { updateUserAction, type ActionResult } from "@/app/admin/actions";
 
 const initialState: ActionResult = {};
@@ -77,7 +78,7 @@ export function EditUserForm({
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-slate-700">نقش</label>
-          <select
+          <NativeSelect
             name="role"
             value={role}
             onChange={(e) =>
@@ -85,13 +86,12 @@ export function EditUserForm({
                 e.target.value as "ADMIN" | "SUPERVISOR" | "MENTOR" | "STUDENT"
               )
             }
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500"
           >
             <option value="STUDENT">دانش‌آموز</option>
             <option value="MENTOR">منتور</option>
             <option value="SUPERVISOR">ناظر</option>
             <option value="ADMIN">ادمین</option>
-          </select>
+          </NativeSelect>
         </div>
 
         <div className="flex flex-col gap-1.5">

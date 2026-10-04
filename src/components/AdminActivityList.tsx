@@ -1,5 +1,6 @@
 "use client";
 
+import { NativeSelect } from "@/components/NativeSelect";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Eye, Search } from "lucide-react";
@@ -59,10 +60,10 @@ export function AdminActivityList({
           <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         </div>
 
-        <select
+        <NativeSelect
+          wrapperClassName="sm:w-56"
           value={mentorFilter}
           onChange={(e) => setMentorFilter(e.target.value)}
-          className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-sm outline-none sm:w-56"
         >
           <option value="">همه منتورها</option>
           <option value="NONE">بدون منتور</option>
@@ -71,7 +72,7 @@ export function AdminActivityList({
               {mentor.name}
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </div>
 
       {filtered.length === 0 ? (

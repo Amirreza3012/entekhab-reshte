@@ -1,6 +1,7 @@
 "use client";
 
 import { assignMentorAction } from "@/app/admin/actions";
+import { NativeSelect } from "@/components/NativeSelect";
 
 export function MentorAssignSelect({
   studentId,
@@ -14,12 +15,13 @@ export function MentorAssignSelect({
   return (
     <form action={assignMentorAction}>
       <input type="hidden" name="studentId" value={studentId} />
-      <select
+      <NativeSelect
+        density="sm"
+        wrapperClassName="min-w-36"
         key={currentMentorId ?? "none"}
         name="mentorId"
         defaultValue={currentMentorId ?? ""}
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
-        className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs outline-none focus:border-slate-500"
       >
         <option value="">بدون منتور</option>
         {mentors.map((mentor) => (
@@ -27,7 +29,7 @@ export function MentorAssignSelect({
             {mentor.name}
           </option>
         ))}
-      </select>
+      </NativeSelect>
     </form>
   );
 }
