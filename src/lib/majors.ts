@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AdmissionMethod, AdmissionType, Gender, Prisma } from "@/generated/prisma/client";
 import { ENTRY_FILTER, MEHR_1406_ENTRY_YEAR } from "@/lib/format";
+import { majorOrderBy } from "@/lib/majorSorting";
 
 export type MajorSearchParams = {
   q?: string;
@@ -12,6 +13,8 @@ export type MajorSearchParams = {
   admissionType?: string;
   admissionMethod?: string;
   page?: number;
+  sort?: string;
+  sortDirection?: string;
 };
 
 export const PAGE_SIZE = 25;
@@ -91,7 +94,7 @@ export async function searchMajors(params: MajorSearchParams) {
   const [items, total] = await Promise.all([
     prisma.major.findMany({
       where,
-      orderBy: [{ fieldGroup: "asc" }, { province: "asc" }, { university: "asc" }],
+      orderBy: majorOrderBy(params.sort, params.sortDirection),
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),

@@ -21,6 +21,8 @@ type SearchParams = {
   admissionType?: string;
   admissionMethod?: string;
   page?: string;
+  sort?: string;
+  sortDirection?: string;
 };
 
 export default async function StudentSearchPage({
@@ -51,6 +53,8 @@ export default async function StudentSearchPage({
       admissionType: sp.admissionType,
       admissionMethod: sp.admissionMethod,
       page: sp.page ? Number(sp.page) : 1,
+      sort: sp.sort,
+      sortDirection: sp.sortDirection,
     }),
     getStudentChoices(user.id),
   ]);
@@ -70,6 +74,8 @@ export default async function StudentSearchPage({
     if (sp.entryYear) params.set("entryYear", sp.entryYear);
     if (sp.admissionType) params.set("admissionType", sp.admissionType);
     if (sp.admissionMethod) params.set("admissionMethod", sp.admissionMethod);
+    if (sp.sort) params.set("sort", sp.sort);
+    if (sp.sortDirection) params.set("sortDirection", sp.sortDirection);
     params.set("page", String(page));
     return `/student?${params.toString()}`;
   };
@@ -102,6 +108,8 @@ export default async function StudentSearchPage({
           entryYear: sp.entryYear,
       admissionType: sp.admissionType,
       admissionMethod: sp.admissionMethod,
+          sort: sp.sort,
+          sortDirection: sp.sortDirection,
         }}
       />
 
@@ -111,6 +119,8 @@ export default async function StudentSearchPage({
 
       <MajorResultsTable
         items={results.items}
+        basePath="/student"
+        searchParams={sp}
         isChosen={(major) => choiceIdByMajorId.has(major.id)}
         renderAction={(major) => (
           <ChoiceToggleButton

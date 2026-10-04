@@ -34,6 +34,8 @@ type SearchParams = {
   admissionMethod?: string;
   page?: string;
   choicesPage?: string;
+  sort?: string;
+  sortDirection?: string;
 };
 
 export default async function MentorStudentPage({
@@ -69,6 +71,8 @@ export default async function MentorStudentPage({
       admissionType: sp.admissionType,
       admissionMethod: sp.admissionMethod,
       page: sp.page ? Number(sp.page) : 1,
+      sort: sp.sort,
+      sortDirection: sp.sortDirection,
     }),
     getStudentChoices(studentId),
     getMentorLogsForStudent(mentor.id, studentId),
@@ -100,6 +104,8 @@ export default async function MentorStudentPage({
     if (sp.entryYear) p.set("entryYear", sp.entryYear);
     if (sp.admissionType) p.set("admissionType", sp.admissionType);
     if (sp.admissionMethod) p.set("admissionMethod", sp.admissionMethod);
+    if (sp.sort) p.set("sort", sp.sort);
+    if (sp.sortDirection) p.set("sortDirection", sp.sortDirection);
     p.set("page", String(page));
     return `/mentor/students/${studentId}?${p.toString()}`;
   };
@@ -115,6 +121,8 @@ export default async function MentorStudentPage({
     if (sp.admissionType) p.set("admissionType", sp.admissionType);
     if (sp.admissionMethod) p.set("admissionMethod", sp.admissionMethod);
     if (sp.page) p.set("page", sp.page);
+    if (sp.sort) p.set("sort", sp.sort);
+    if (sp.sortDirection) p.set("sortDirection", sp.sortDirection);
     p.set("choicesPage", String(page));
     return `/mentor/students/${studentId}?${p.toString()}`;
   };
@@ -180,6 +188,8 @@ export default async function MentorStudentPage({
             entryYear: sp.entryYear,
       admissionType: sp.admissionType,
       admissionMethod: sp.admissionMethod,
+            sort: sp.sort,
+            sortDirection: sp.sortDirection,
           }}
         />
         <p className="text-sm text-slate-500">
@@ -187,6 +197,8 @@ export default async function MentorStudentPage({
         </p>
         <MajorResultsTable
           items={results.items}
+          basePath={`/mentor/students/${studentId}`}
+          searchParams={sp}
           isChosen={(major) => choiceIdByMajorId.has(major.id)}
           renderAction={(major) => (
             <ChoiceToggleButton

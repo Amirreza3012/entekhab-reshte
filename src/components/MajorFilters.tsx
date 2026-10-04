@@ -27,6 +27,8 @@ export function MajorFilters({
     entryYear?: string;
     admissionType?: string;
     admissionMethod?: string;
+    sort?: string;
+    sortDirection?: string;
   };
 }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -50,6 +52,8 @@ export function MajorFilters({
       method="get"
       className="grid grid-cols-1 gap-3 rounded-[1.5rem] border border-white bg-white/90 p-5 shadow-lg shadow-slate-200/40 backdrop-blur sm:grid-cols-2 lg:grid-cols-4"
     >
+      {defaults.sort && <input type="hidden" name="sort" value={defaults.sort} />}
+      {defaults.sortDirection && <input type="hidden" name="sortDirection" value={defaults.sortDirection} />}
       <input
         type="text"
         name="q"

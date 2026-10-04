@@ -3,16 +3,38 @@ import { GENDER_LABELS, TERM_LABELS, majorTint, toPersianDigits } from "@/lib/fo
 import { MajorBadges } from "@/components/MajorBadges";
 import { MajorTintLegend } from "@/components/MajorTintLegend";
 import type { ReactNode } from "react";
+import Link from "next/link";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from "lucide-react";
+import { MAJOR_SORT_OPTIONS, majorSortHref, resolveMajorSort, type MajorSortField } from "@/lib/majorSorting";
 
 export function MajorResultsTable({
   items,
   isChosen,
   renderAction,
+  basePath = "/student",
+  searchParams = {},
 }: {
   items: Major[];
   isChosen?: (major: Major) => boolean;
   renderAction: (major: Major) => ReactNode;
+  basePath?: string;
+  searchParams?: Record<string, string | undefined>;
 }) {
+  const selected = resolveMajorSort(searchParams.sort, searchParams.sortDirection);
+  const heading = (label: string, field: MajorSortField) => {
+    const active = selected.field === field;
+    const next = active && selected.direction === "asc" ? "desc" : "asc";
+    const Icon = active ? selected.direction === "asc" ? ArrowUp : ArrowDown : ArrowUpDown;
+    return (
+      <th scope="col" className="whitespace-nowrap px-3 py-2 font-medium" aria-sort={active ? selected.direction === "asc" ? "ascending" : "descending" : "none"}>
+        <Link href={majorSortHref(basePath, searchParams, field, next)} scroll={false} prefetch={false}
+          aria-label={`مرتب‌سازی ${label}؛ ${next === "asc" ? "صعودی" : "نزولی"}`}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${active ? "bg-violet-100 text-violet-800" : "text-slate-600 hover:bg-violet-50 hover:text-violet-700"}`}>
+          {label}<Icon aria-hidden="true" className="h-3.5 w-3.5" />
+        </Link>
+      </th>
+    );
+  };
   if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center text-sm text-slate-500 shadow-sm">
@@ -24,18 +46,38 @@ export function MajorResultsTable({
   return (
     <div className="flex min-w-0 flex-col gap-3">
     <MajorTintLegend />
+    <form key={`${selected.field}:${selected.direction}`} action={basePath} method="get" className="flex flex-wrap items-center gap-2 rounded-2xl border border-white bg-white/90 p-3 text-xs shadow-sm">
+      {Object.entries(searchParams).filter(([key, value]) => typeof value === "string" && value && !["page", "sort", "sortDirection"].includes(key))
+        .map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
+      <label className="flex flex-wrap items-center gap-2 font-semibold text-slate-700">مرتب‌سازی بر اساس
+        <span className="relative block min-w-0 max-w-full">
+          <select name="sort" defaultValue={selected.field} className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pr-3 pl-8 text-sm text-slate-800 outline-none">
+            {MAJOR_SORT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          </select>
+          <ChevronDown aria-hidden="true" className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        </span>
+      </label>
+      <div className="relative min-w-[7rem]">
+        <select name="sortDirection" aria-label="جهت مرتب‌سازی" defaultValue={selected.direction} className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pr-3 pl-8 text-sm text-slate-800 outline-none">
+          <option value="asc">صعودی</option><option value="desc">نزولی</option>
+        </select>
+        <ChevronDown aria-hidden="true" className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      </div>
+      <button type="submit" className="rounded-xl bg-violet-600 px-3 py-2 font-semibold text-white hover:bg-violet-700">اعمال مرتب‌سازی</button>
+      <span className="text-slate-500">روی تمام نتایج جست‌وجو</span>
+    </form>
     <div className="max-w-full overflow-x-auto rounded-2xl border border-white bg-white/90 shadow-sm shadow-slate-200/70">
       <table className="w-full min-w-[1600px] text-sm">
         <thead className="bg-slate-50/80 text-xs text-slate-500">
           <tr className="text-right">
             <th className="whitespace-nowrap px-3 py-2 font-medium"></th>
-            <th className="whitespace-nowrap px-3 py-2 font-medium">رشته</th>
-            <th className="whitespace-nowrap px-3 py-2 font-medium">استان / دانشگاه</th>
-            <th className="whitespace-nowrap px-3 py-2 font-medium">دوره تحصیلی</th>
-            <th className="whitespace-nowrap px-3 py-2 font-medium">کدرشته‌محل</th>
-            <th className="whitespace-nowrap px-3 py-2 font-medium">ظرفیت</th>
-            <th className="whitespace-nowrap px-3 py-2 font-medium">جنسیت</th>
-            <th className="whitespace-nowrap px-3 py-2 font-medium">توضیحات</th>
+            {heading("رشته", "title")}
+            {heading("استان / دانشگاه", "province")}
+            {heading("دوره تحصیلی", "studyPeriod")}
+            {heading("کدرشته‌محل", "majorCode")}
+            {heading("ظرفیت", "capacity")}
+            {heading("جنسیت", "gender")}
+            {heading("توضیحات", "description")}
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
