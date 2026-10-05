@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ExternalLink, NotebookPen } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { Role, MentorAction } from "@/generated/prisma/client";
-import { getMenteeOrThrow, getMentorLogsForStudent } from "@/lib/mentor";
+import { getMenteeOrThrow, getMentorLogsForStudent, HISTORY_LIMIT } from "@/lib/mentor";
 import { getMajorFilterOptions, searchMajors } from "@/lib/majors";
 import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { MajorFilters } from "@/components/MajorFilters";
@@ -12,6 +12,7 @@ import { BackLink } from "@/components/BackLink";
 import { ChoiceToggleButton } from "@/components/ChoiceToggleButton";
 import { ChoiceList } from "@/components/ChoiceList";
 import { MentorLogItem } from "@/components/MentorLogItem";
+import { ChoiceHistoryItem } from "@/components/ChoiceHistoryItem";
 import { PdfExportButton } from "@/components/PdfExportButton";
 import {
   moveChoiceForStudentAction,
@@ -252,13 +253,18 @@ export default async function MentorStudentPage({
 
       <section className="flex flex-col gap-4">
         <h2 className="font-semibold text-slate-800">تاریخچه تغییرات</h2>
+        {historyLogs.length > HISTORY_LIMIT && (
+          <p className="text-xs text-slate-500">
+            {toPersianDigits(HISTORY_LIMIT)} تغییر آخر از {toPersianDigits(historyLogs.length)} تغییر نمایش داده می‌شود.
+          </p>
+        )}
         <div className="flex flex-col gap-2">
           {historyLogs.length === 0 ? (
             <p className="text-sm text-slate-500">هنوز تغییری ثبت نشده است.</p>
           ) : (
-            historyLogs.map((log) => (
-              <MentorLogItem key={log.id} log={log} studentId={studentId} />
-            ))
+            historyLogs
+              .slice(0, HISTORY_LIMIT)
+              .map((log) => <ChoiceHistoryItem key={log.id} log={log} />)
           )}
         </div>
       </section>

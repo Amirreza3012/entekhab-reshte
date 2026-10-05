@@ -7,6 +7,7 @@ import { BackLink } from "@/components/BackLink";
 import { ChoiceList } from "@/components/ChoiceList";
 import { PdfExportButton } from "@/components/PdfExportButton";
 import { StudentMajorSearch } from "@/components/StudentMajorSearch";
+import { ChoiceHistory } from "@/components/ChoiceHistory";
 import {
   removeChoiceForAdminAction,
   reorderChoicesForAdminAction,
@@ -72,6 +73,8 @@ export default async function SupervisorStudentActivityPage({
         searchParams={sp}
         choices={choices}
       />
+
+      <ChoiceHistory studentId={studentId} />
     </div>
   );
 }

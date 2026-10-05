@@ -126,6 +126,9 @@ model MentorLog {
   mentor    User         @relation("MentorLogsAsMentor", fields: [mentorId], references: [id], onDelete: Cascade)
   studentId String
   student   User         @relation("MentorLogsAsStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  // Who made the change: mentorId holds the acting user (any role), kept for
+  // history compatibility; actorRole says which kind of user it is.
+  actorRole Role         @default(MENTOR)
   action    MentorAction
   detail    String
   createdAt DateTime     @default(now())

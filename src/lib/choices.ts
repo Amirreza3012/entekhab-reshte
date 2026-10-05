@@ -5,6 +5,25 @@ export const MAX_CHOICES = 150;
 
 class ChoiceError extends Error {}
 
+type ChoiceLogAction = "ADD_CHOICE" | "REMOVE_CHOICE" | "REORDER_CHOICE";
+
+// Every change to a student's list is logged, whoever makes it (student,
+// mentor, admin or supervisor), so the history can answer "who changed what".
+function logChoiceChange(
+  tx: Pick<typeof prisma, "mentorLog">,
+  entry: { actorId: string; actorRole: Role; studentId: string; action: ChoiceLogAction; detail: string }
+) {
+  return tx.mentorLog.create({
+    data: {
+      mentorId: entry.actorId,
+      actorRole: entry.actorRole,
+      studentId: entry.studentId,
+      action: entry.action,
+      detail: entry.detail,
+    },
+  });
+}
+
 async function assertMentorOwnsStudent(mentorId: string, studentId: string) {
   const student = await prisma.user.findUnique({ where: { id: studentId } });
   if (!student || student.role !== Role.STUDENT || student.mentorId !== mentorId) {
@@ -74,16 +93,13 @@ export async function addChoice({
       data: { studentId, majorId, rank: count + 1 },
     });
 
-    if (actorRole === Role.MENTOR) {
-      await tx.mentorLog.create({
-        data: {
-          mentorId: actorId,
-          studentId,
-          action: "ADD_CHOICE",
-          detail: `افزودن «${major.title} - ${major.university}» در رتبه ${count + 1}`,
-        },
-      });
-    }
+    await logChoiceChange(tx, {
+      actorId,
+      actorRole,
+      studentId,
+      action: "ADD_CHOICE",
+      detail: `افزودن «${major.title} - ${major.university}» در رتبه ${count + 1}`,
+    });
 
     return choice;
   });
@@ -124,16 +140,13 @@ export async function removeChoice({
       }
     }
 
-    if (actorRole === Role.MENTOR) {
-      await tx.mentorLog.create({
-        data: {
-          mentorId: actorId,
-          studentId: choice.studentId,
-          action: "REMOVE_CHOICE",
-          detail: `حذف «${choice.major.title} - ${choice.major.university}»`,
-        },
-      });
-    }
+    await logChoiceChange(tx, {
+      actorId,
+      actorRole,
+      studentId: choice.studentId,
+      action: "REMOVE_CHOICE",
+      detail: `حذف «${choice.major.title} - ${choice.major.university}»`,
+    });
   });
 }
 
@@ -176,16 +189,13 @@ export async function moveChoice({
       data: { rank: neighbor.rank },
     });
 
-    if (actorRole === Role.MENTOR) {
-      await tx.mentorLog.create({
-        data: {
-          mentorId: actorId,
-          studentId: choice.studentId,
-          action: "REORDER_CHOICE",
-          detail: `جابجایی «${choice.major.title}» به رتبه ${neighbor.rank}`,
-        },
-      });
-    }
+    await logChoiceChange(tx, {
+      actorId,
+      actorRole,
+      studentId: choice.studentId,
+      action: "REORDER_CHOICE",
+      detail: `جابجایی «${choice.major.title}» به رتبه ${neighbor.rank}`,
+    });
   });
 }
 
@@ -226,16 +236,13 @@ export async function reorderAllChoices({
       )
     );
 
-    if (actorRole === Role.MENTOR) {
-      await tx.mentorLog.create({
-        data: {
-          mentorId: actorId,
-          studentId,
-          action: "REORDER_CHOICE",
-          detail: "ترتیب انتخاب‌ها با کشیدن و رها کردن بازچینی شد.",
-        },
-      });
-    }
+    await logChoiceChange(tx, {
+      actorId,
+      actorRole,
+      studentId,
+      action: "REORDER_CHOICE",
+      detail: "ترتیب انتخاب‌ها با کشیدن و رها کردن بازچینی شد.",
+    });
   });
 }
 
