@@ -58,6 +58,7 @@ export function CreateUserForm() {
         type="email"
         placeholder="ایمیل"
         required
+        dir={email ? "ltr" : "rtl"}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"

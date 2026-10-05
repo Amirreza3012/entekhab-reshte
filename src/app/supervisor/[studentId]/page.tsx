@@ -6,19 +6,25 @@ import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { BackLink } from "@/components/BackLink";
 import { ChoiceList } from "@/components/ChoiceList";
 import { PdfExportButton } from "@/components/PdfExportButton";
+import { StudentMajorSearch } from "@/components/StudentMajorSearch";
 import {
   removeChoiceForAdminAction,
   reorderChoicesForAdminAction,
 } from "@/app/admin/actions";
 import { toPersianDigits } from "@/lib/format";
 
+type SearchParams = Record<string, string | undefined>;
+
 export default async function SupervisorStudentActivityPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ studentId: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
   await requireRole(Role.SUPERVISOR);
   const { studentId } = await params;
+  const sp = await searchParams;
 
   const student = await getUserById(studentId);
   if (!student || student.role !== Role.STUDENT) notFound();
@@ -59,6 +65,13 @@ export default async function SupervisorStudentActivityPage({
           />
         </div>
       </div>
+
+      <StudentMajorSearch
+        basePath={`/supervisor/${studentId}`}
+        studentId={studentId}
+        searchParams={sp}
+        choices={choices}
+      />
     </div>
   );
 }

@@ -72,6 +72,7 @@ export function EditUserForm({
           <input
             name="email"
             type="email"
+            dir="ltr"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required

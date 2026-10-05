@@ -8,6 +8,7 @@ import { hashPassword } from "@/lib/password";
 import { Prisma, Role } from "@/generated/prisma/client";
 import { parseNationalId } from "@/lib/nationalId";
 import {
+  addChoice,
   moveChoice,
   removeChoice,
   reorderAllChoices,
@@ -199,6 +200,33 @@ const ACTIVITY_VIEWER_ROLES = [Role.ADMIN, Role.SUPERVISOR];
 function revalidateActivityPaths(studentId: string) {
   revalidatePath(`/admin/activity/${studentId}`);
   revalidatePath(`/supervisor/${studentId}`);
+}
+
+// Admins and supervisors can add a major to a student's list (e.g. after the
+// student asks for a change); like the other admin choice actions it is not
+// written to the mentor log.
+export async function addChoiceForAdminAction(
+  _prev: ActionResult,
+  formData: FormData
+): Promise<ActionResult> {
+  const actor = await requireRole(ACTIVITY_VIEWER_ROLES);
+  const studentId = String(formData.get("studentId") ?? "");
+  const majorId = String(formData.get("majorId") ?? "");
+
+  const student = await prisma.user.findUnique({ where: { id: studentId } });
+  if (!student || student.role !== Role.STUDENT) {
+    return { error: "دانش‌آموز یافت نشد." };
+  }
+
+  try {
+    await addChoice({ studentId, majorId, actorId: actor.id, actorRole: actor.role });
+  } catch (error) {
+    if (error instanceof ChoiceError) return { error: error.message };
+    throw error;
+  }
+
+  revalidateActivityPaths(studentId);
+  return {};
 }
 
 export async function moveChoiceForAdminAction(formData: FormData) {
