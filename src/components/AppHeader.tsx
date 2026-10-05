@@ -46,7 +46,7 @@ export function AppHeader({ title, userName, links }: { title: string; userName:
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-[#f6f7f2]/90 px-4 py-3 backdrop-blur-xl lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:w-72 lg:flex-col lg:overflow-hidden lg:border-b-0 lg:bg-[#111827] lg:p-5 lg:text-white lg:shadow-2xl lg:shadow-slate-900/15">
+      <header className="app-sidebar sticky top-0 z-50 border-b border-slate-200/70 bg-[#f6f7f2]/90 px-4 py-3 backdrop-blur-xl lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:w-72 lg:flex-col lg:overflow-hidden lg:overscroll-y-none lg:border-b-0 lg:bg-[#111827] lg:p-5 lg:text-white lg:shadow-2xl lg:shadow-slate-900/15 lg:backdrop-blur-none">
         <div className="flex items-center justify-between lg:block">
           <Link href="/" className="flex items-center gap-3 lg:mb-9 lg:px-1">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm lg:h-12 lg:w-12"><Image src="/logo.png" alt="لوگو" width={42} height={28} className="h-auto w-auto object-contain" loading="eager" /></span>
@@ -56,7 +56,7 @@ export function AppHeader({ title, userName, links }: { title: string; userName:
         </div>
         <div className="hidden min-h-0 flex-1 flex-col lg:flex">
           <div className="mb-5 rounded-2xl bg-gradient-to-l from-violet-500/20 to-cyan-400/10 p-3.5 text-xs leading-6 text-white/65"><div className="mb-1 flex items-center gap-2 font-bold text-[#dfff4f]"><Sparkles className="h-3.5 w-3.5" /> مسیر آینده از اینجا شروع می‌شود</div>انتخاب‌ها را دقیق، ساده و آگاهانه مدیریت کنید.</div>
-          <div className="min-h-0 flex-1 overflow-y-auto">{navigation}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto lg:overscroll-y-none">{navigation}</div>
           <div className="mt-5">{account}</div>
         </div>
       </header>

@@ -36,6 +36,14 @@ html {
   background: var(--background);
 }
 
+/* Keep the fixed desktop sidebar still during elastic root overscroll.
+   Scope this to dashboards; mobile and public pages retain native scrolling. */
+@media (min-width: 64rem) {
+  html:has(.app-sidebar) {
+    overscroll-behavior-y: none;
+  }
+}
+
 main {
   box-sizing: border-box;
   width: 100%;
