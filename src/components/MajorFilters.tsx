@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { RotateCcw } from "lucide-react";
 import { NativeSelect } from "@/components/NativeSelect";
 import { SearchableSelect } from "@/components/SearchableSelect";
@@ -43,15 +44,39 @@ export function MajorFilters({
       defaults.admissionType ||
       defaults.admissionMethod
   );
-  // Re-submit on every change so the other dropdowns narrow down immediately.
-  const submit = () => formRef.current?.requestSubmit();
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+
+  // Apply the filters with a client-side navigation instead of a full page
+  // load: the server re-renders with fresh data, but the scroll position (and
+  // the rest of the page) stay put, so the next filter is right where you are.
+  const submit = () => {
+    const form = formRef.current;
+    if (!form) return;
+    const params = new URLSearchParams();
+    for (const [key, value] of new FormData(form)) {
+      if (typeof value !== "string" || !value) continue;
+      if (key === "gender" && value === "ANY") continue;
+      params.set(key, value);
+    }
+    const query = params.toString();
+    startTransition(() => router.push(query ? `${action}?${query}` : action, { scroll: false }));
+  };
 
   return (
     <form
+      // Remount when the applied filters change so the inputs show the new
+      // defaults (including after a reset).
+      key={JSON.stringify(defaults)}
       ref={formRef}
       action={action}
       method="get"
-      className="grid grid-cols-1 gap-3 rounded-[1.5rem] border border-white bg-white/90 p-5 shadow-lg shadow-slate-200/40 backdrop-blur sm:grid-cols-2 lg:grid-cols-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        submit();
+      }}
+      aria-busy={pending}
+      className={`grid grid-cols-1 gap-3 rounded-[1.5rem] border border-white bg-white/90 p-5 shadow-lg shadow-slate-200/40 backdrop-blur transition-opacity sm:grid-cols-2 lg:grid-cols-4 ${pending ? "opacity-70" : ""}`}
     >
       {defaults.sort && <input type="hidden" name="sort" value={defaults.sort} />}
       {defaults.sortDirection && <input type="hidden" name="sortDirection" value={defaults.sortDirection} />}
@@ -144,7 +169,7 @@ export function MajorFilters({
       <button
         type="button"
         disabled={!hasFilters}
-        onClick={() => window.location.assign(action)}
+        onClick={() => startTransition(() => router.push(action, { scroll: false }))}
         title="پاک کردن همه فیلترها"
         className="flex items-center justify-center gap-2 rounded-xl bg-[#5b5cf0] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-[#5051dc] disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:bg-[#5b5cf0]"
       >
