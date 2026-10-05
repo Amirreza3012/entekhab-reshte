@@ -18,6 +18,7 @@ import {
   removeChoiceForStudentAction,
   addChoiceForStudentAction,
   addMentorNoteAction,
+  reorderChoicesForStudentAction,
 } from "@/app/mentor/actions";
 import { toPersianDigits } from "@/lib/format";
 
@@ -163,6 +164,9 @@ export default async function MentorStudentPage({
         </div>
         <ChoiceList
           choices={pagedChoices}
+          allChoices={choices}
+          studentId={studentId}
+          reorderAction={reorderChoicesForStudentAction}
           moveAction={moveChoiceForStudentAction}
           removeAction={removeChoiceForStudentAction}
           extraHiddenFields={{ studentId }}

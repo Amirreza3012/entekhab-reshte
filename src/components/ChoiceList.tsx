@@ -11,6 +11,7 @@ import type { Choice, Major } from "@/generated/prisma/client";
 import { GENDER_LABELS, TERM_LABELS, majorTint, toPersianDigits, type MajorTint } from "@/lib/format";
 import { MajorBadges } from "@/components/MajorBadges";
 import { MajorTintLegend } from "@/components/MajorTintLegend";
+import { QuickChoiceOrder } from "@/components/QuickChoiceOrder";
 import styles from "./ChoiceList.module.css";
 
 type ChoiceWithMajor = Choice & { major: Major };
@@ -24,8 +25,11 @@ export function ChoiceList({
   extraHiddenFields,
   studentId,
   reorderAction,
+  allChoices,
 }: {
   choices: ChoiceWithMajor[];
+  /** Complete list for quick ordering when the main table is paginated. */
+  allChoices?: ChoiceWithMajor[];
   moveAction?: (formData: FormData) => void | Promise<void>;
   removeAction?: (formData: FormData) => void | Promise<void>;
   readOnly?: boolean;
@@ -35,16 +39,20 @@ export function ChoiceList({
 }) {
   const router = useRouter();
   const id = useId();
-  const [items, setItems] = useState(choices);
-  const [lastChoices, setLastChoices] = useState(choices);
+  const sourceChoices = allChoices ?? choices;
+  const [items, setItems] = useState(sourceChoices);
+  const [lastChoices, setLastChoices] = useState(sourceChoices);
   const [pending, startTransition] = useTransition();
   const busy = useRef(false);
   const [dragging, setDragging] = useState(false);
   const [status, setStatus] = useState("");
-  if (choices !== lastChoices) {
-    setLastChoices(choices);
-    setItems(choices);
+  const [failed, setFailed] = useState(false);
+  if (sourceChoices !== lastChoices) {
+    setLastChoices(sourceChoices);
+    setItems(sourceChoices);
   }
+  const pageStart = Math.max(0, (choices[0]?.rank ?? 1) - 1);
+  const visibleItems = allChoices ? items.slice(pageStart, pageStart + choices.length) : items;
   const sortable = !!reorderAction && !!studentId && !readOnly;
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -53,23 +61,29 @@ export function ChoiceList({
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     setDragging(false);
-    if (!sortable || !reorderAction || !studentId || busy.current || pending || !over || active.id === over.id) return;
-    const from = items.findIndex((item) => item.id === active.id);
-    const to = items.findIndex((item) => item.id === over.id);
+    if (over) reorderById(String(active.id), String(over.id));
+  }
+
+  function reorderById(sourceId: string, targetId: string) {
+    if (!sortable || !reorderAction || !studentId || busy.current || pending || sourceId === targetId) return;
+    const from = items.findIndex((item) => item.id === sourceId);
+    const to = items.findIndex((item) => item.id === targetId);
     if (from < 0 || to < 0) return;
     const previous = items;
     const reordered = arrayMove(items, from, to).map((item, index) => ({ ...item, rank: index + 1 }));
     busy.current = true;
+    setFailed(false);
     setItems(reordered);
     setStatus("در حال ذخیره ترتیب…");
     startTransition(async () => {
       try {
         const result = await reorderAction(studentId, reordered.map((item) => item.id));
         if (result?.error) throw new Error(result.error);
-        setStatus("ترتیب انتخاب‌ها ذخیره شد");
+        setStatus(`انتخاب ${toPersianDigits(previous[from].rank)} به جایگاه ${toPersianDigits(to + 1)} منتقل شد`);
         router.refresh();
       } catch (error) {
         setItems(previous);
+        setFailed(true);
         setStatus("ذخیره انجام نشد؛ ترتیب قبلی بازگردانده شد");
         toast.error(error instanceof Error ? error.message : "ذخیره ترتیب انجام نشد؛ دوباره تلاش کنید.");
       } finally {
@@ -78,25 +92,38 @@ export function ChoiceList({
     });
   }
 
-  function runAction(action: typeof removeAction, data: FormData) {
+  function runAction(action: typeof removeAction, data: FormData, removedId?: string) {
     if (!action || busy.current || pending || dragging) return;
     busy.current = true;
+    setFailed(false);
     startTransition(async () => {
       try {
         await action(data);
+        if (removedId) {
+          setItems((current) => current.filter((item) => item.id !== removedId).map((item, index) => ({ ...item, rank: index + 1 })));
+          setStatus("انتخاب حذف شد؛ شماره‌ها به‌روز شدند");
+        }
         router.refresh();
       } catch {
+        setFailed(true);
+        setStatus("تغییر ذخیره نشد؛ دوباره تلاش کنید.");
         toast.error("تغییر ذخیره نشد؛ دوباره تلاش کنید.");
       } finally {
         busy.current = false;
       }
     });
   }
+  function removeById(choiceId: string) {
+    const data = new FormData();
+    for (const [name, value] of Object.entries(extraHiddenFields ?? {})) data.set(name, value);
+    data.set("choiceId", choiceId);
+    runAction(removeAction, data, choiceId);
+  }
   const extraInputs = Object.entries(extraHiddenFields ?? {}).map(
     ([name, value]) => <input key={name} type="hidden" name={name} value={value} />
   );
 
-  if (choices.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center text-sm text-slate-500 shadow-sm">
         هنوز هیچ رشته‌ای انتخاب نشده است.
@@ -112,7 +139,10 @@ export function ChoiceList({
     <div className="min-w-0 max-w-full rounded-2xl border border-white bg-white/90 shadow-sm shadow-slate-200/70">
       {sortable && <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
         <span className="flex items-center gap-2"><GripVertical aria-hidden="true" className="h-4 w-4 text-violet-500" />برای جابه‌جایی، دستگیره‌ی نقطه‌ای کنار ردیف را بگیرید و بکشید.</span>
-        <span role="status" aria-live="polite" className="text-violet-600">{pending ? "در حال ذخیره…" : status}</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span role="status" aria-live="polite" className="text-violet-600">{pending ? "در حال ذخیره…" : status}</span>
+          <QuickChoiceOrder choices={items} disabled={pending || dragging} status={status} failed={failed} onMove={reorderById} onRemove={removeAction ? removeById : undefined} />
+        </div>
       </div>}
       <div className="max-w-full overflow-x-auto rounded-2xl" tabIndex={0} role="region" aria-label="جدول انتخاب‌ها؛ قابل اسکرول افقی">
       <table className="w-full min-w-[1280px] text-sm" aria-busy={pending}>
@@ -130,9 +160,9 @@ export function ChoiceList({
             {!readOnly && <th className="px-3 py-2 font-medium"></th>}
           </tr>
         </thead>
-        <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext items={visibleItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
         <tbody className="divide-y divide-slate-100">
-          {items.map((choice, index) => {
+          {visibleItems.map((choice) => {
             const tint = majorTint(choice.major.admissionType, choice.major.entryYear);
             return (
             <ChoiceRow key={choice.id} choice={choice} sortable={sortable} disabled={pending} tint={tint}>
@@ -173,7 +203,7 @@ export function ChoiceList({
                       <input type="hidden" name="direction" value="up" />
                       <button
                         type="submit"
-                        disabled={pending || index === 0}
+                        disabled={pending || choice.rank === 1}
                         className="rounded-lg border border-slate-300 p-1 text-xs hover:bg-slate-50 disabled:opacity-30"
                         title="بالا"
                       >
@@ -186,7 +216,7 @@ export function ChoiceList({
                       <input type="hidden" name="direction" value="down" />
                       <button
                         type="submit"
-                        disabled={pending || index === items.length - 1}
+                        disabled={pending || choice.rank === items.length}
                         className="rounded-lg border border-slate-300 p-1 text-xs hover:bg-slate-50 disabled:opacity-30"
                         title="پایین"
                       >
