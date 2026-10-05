@@ -53,3 +53,12 @@ export async function getChoiceHistory(studentId: string) {
   ]);
   return { logs, total };
 }
+
+// All mentors' notes for a student, read-only for admins.
+export function getStudentNotes(studentId: string) {
+  return prisma.mentorLog.findMany({
+    where: { studentId, action: MentorAction.NOTE },
+    orderBy: { createdAt: "desc" },
+    include: { mentor: { select: { name: true } } },
+  });
+}

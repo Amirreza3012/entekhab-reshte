@@ -8,6 +8,7 @@ import { ChoiceList } from "@/components/ChoiceList";
 import { PdfExportButton } from "@/components/PdfExportButton";
 import { StudentMajorSearch } from "@/components/StudentMajorSearch";
 import { ChoiceHistory } from "@/components/ChoiceHistory";
+import { StudentNotes } from "@/components/StudentNotes";
 import {
   removeChoiceForAdminAction,
   reorderChoicesForAdminAction,
@@ -73,6 +74,8 @@ export default async function AdminStudentActivityPage({
         searchParams={sp}
         choices={choices}
       />
+
+      <StudentNotes studentId={studentId} />
 
       <ChoiceHistory studentId={studentId} />
     </div>

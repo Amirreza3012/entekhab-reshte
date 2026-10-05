@@ -5,7 +5,7 @@ import { ROLE_LABELS } from "@/lib/roles";
 const ACTOR_STYLE: Record<Role, { badge: string; card: string }> = {
   STUDENT: { badge: "bg-sky-100 text-sky-800", card: "border-sky-100 bg-sky-50/60" },
   MENTOR: { badge: "bg-slate-100 text-slate-700", card: "border-slate-200 bg-white" },
-  ADMIN: { badge: "bg-violet-100 text-violet-800", card: "border-violet-100 bg-violet-50/50" },
+  ADMIN: { badge: "bg-emerald-100 text-emerald-800", card: "border-emerald-100 bg-emerald-50/60" },
   SUPERVISOR: { badge: "bg-amber-100 text-amber-900", card: "border-amber-100 bg-amber-50/50" },
 };
 
