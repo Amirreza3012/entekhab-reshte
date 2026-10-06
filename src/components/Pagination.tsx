@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { toPersianDigits } from "@/lib/format";
+import { PageJump } from "@/components/PageJump";
 
 export function Pagination({
   page,
@@ -13,8 +13,19 @@ export function Pagination({
 }) {
   if (pageCount <= 1) return null;
 
+  // The dropdown navigates on the client, where buildHref is not available, so
+  // hand it the pieces of the link: the path, the page parameter (the one that
+  // differs between two pages) and everything else in the query.
+  const first = new URL(buildHref(1), "http://local");
+  const second = new URL(buildHref(2), "http://local");
+  const pageParam =
+    [...second.searchParams.keys()].find(
+      (key) => first.searchParams.get(key) !== second.searchParams.get(key)
+    ) ?? "page";
+  const query = [...first.searchParams].filter(([key]) => key !== pageParam);
+
   return (
-    <div className="flex items-center justify-center gap-2 py-5 text-sm">
+    <div className="flex flex-wrap items-center justify-center gap-2 py-5 text-sm">
       <Link
         href={buildHref(Math.max(1, page - 1))}
         className={`flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm ${
@@ -24,9 +35,13 @@ export function Pagination({
         <ChevronRight className="h-3.5 w-3.5" />
         قبلی
       </Link>
-      <span className="rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white">
-        صفحه {toPersianDigits(page)} از {toPersianDigits(pageCount)}
-      </span>
+      <PageJump
+        page={page}
+        pageCount={pageCount}
+        path={first.pathname}
+        query={query}
+        pageParam={pageParam}
+      />
       <Link
         href={buildHref(Math.min(pageCount, page + 1))}
         className={`flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm ${

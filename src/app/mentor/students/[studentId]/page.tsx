@@ -1,10 +1,10 @@
-import Link from "next/link";
-import { ExternalLink, NotebookPen } from "lucide-react";
+import { NotebookPen } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { Role, MentorAction } from "@/generated/prisma/client";
 import { getMenteeOrThrow, getMentorLogsForStudent, HISTORY_LIMIT } from "@/lib/mentor";
 import { getMajorFilterOptions, searchMajors } from "@/lib/majors";
 import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
+import { choicesPageHref, paginateChoices } from "@/lib/choicePaging";
 import { MajorFilters } from "@/components/MajorFilters";
 import { MajorResultsTable } from "@/components/MajorResultsTable";
 import { Pagination } from "@/components/Pagination";
@@ -14,6 +14,7 @@ import { ChoiceList } from "@/components/ChoiceList";
 import { MentorLogItem } from "@/components/MentorLogItem";
 import { ChoiceHistoryItem } from "@/components/ChoiceHistoryItem";
 import { PdfExportButton } from "@/components/PdfExportButton";
+import { ViewAllChoicesLink } from "@/components/ViewAllChoicesLink";
 import {
   moveChoiceForStudentAction,
   removeChoiceForStudentAction,
@@ -22,8 +23,6 @@ import {
   reorderChoicesForStudentAction,
 } from "@/app/mentor/actions";
 import { toPersianDigits } from "@/lib/format";
-
-const CHOICES_PAGE_SIZE = 10;
 
 type SearchParams = {
   q?: string;
@@ -86,15 +85,7 @@ export default async function MentorStudentPage({
   const choiceIdByMajorId = new Map(choices.map((c) => [c.majorId, c.id]));
   const atLimit = choices.length >= MAX_CHOICES;
 
-  const choicesPage = Math.max(1, Number(sp.choicesPage ?? 1));
-  const choicesPageCount = Math.max(
-    1,
-    Math.ceil(choices.length / CHOICES_PAGE_SIZE)
-  );
-  const pagedChoices = choices.slice(
-    (choicesPage - 1) * CHOICES_PAGE_SIZE,
-    choicesPage * CHOICES_PAGE_SIZE
-  );
+  const pagedChoices = paginateChoices(choices, sp.choicesPage);
 
   const buildHref = (page: number) => {
     const p = new URLSearchParams();
@@ -108,26 +99,13 @@ export default async function MentorStudentPage({
     if (sp.admissionMethod) p.set("admissionMethod", sp.admissionMethod);
     if (sp.sort) p.set("sort", sp.sort);
     if (sp.sortDirection) p.set("sortDirection", sp.sortDirection);
+    if (sp.choicesPage) p.set("choicesPage", sp.choicesPage);
     p.set("page", String(page));
     return `/mentor/students/${studentId}?${p.toString()}`;
   };
 
-  const buildChoicesHref = (page: number) => {
-    const p = new URLSearchParams();
-    if (sp.q) p.set("q", sp.q);
-    if (sp.fieldGroup) p.set("fieldGroup", sp.fieldGroup);
-    if (sp.province) p.set("province", sp.province);
-    if (sp.studyPeriod) p.set("studyPeriod", sp.studyPeriod);
-    if (sp.gender) p.set("gender", sp.gender);
-    if (sp.entryYear) p.set("entryYear", sp.entryYear);
-    if (sp.admissionType) p.set("admissionType", sp.admissionType);
-    if (sp.admissionMethod) p.set("admissionMethod", sp.admissionMethod);
-    if (sp.page) p.set("page", sp.page);
-    if (sp.sort) p.set("sort", sp.sort);
-    if (sp.sortDirection) p.set("sortDirection", sp.sortDirection);
-    p.set("choicesPage", String(page));
-    return `/mentor/students/${studentId}?${p.toString()}`;
-  };
+  const buildChoicesHref = (page: number) =>
+    choicesPageHref(`/mentor/students/${studentId}`, sp, page);
 
   return (
     <div className="flex flex-col gap-8">
@@ -152,19 +130,11 @@ export default async function MentorStudentPage({
               choices={choices}
               fileName={`انتخاب-های-${student.name}.pdf`}
             />
-            <Link
-              href={`/mentor/students/${studentId}/choices`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              <ExternalLink className="h-4 w-4" />
-              مشاهده کامل
-            </Link>
+            <ViewAllChoicesLink href={`/mentor/students/${studentId}/choices`} />
           </div>
         </div>
         <ChoiceList
-          choices={pagedChoices}
+          choices={pagedChoices.items}
           allChoices={choices}
           studentId={studentId}
           reorderAction={reorderChoicesForStudentAction}
@@ -173,8 +143,8 @@ export default async function MentorStudentPage({
           extraHiddenFields={{ studentId }}
         />
         <Pagination
-          page={choicesPage}
-          pageCount={choicesPageCount}
+          page={pagedChoices.page}
+          pageCount={pagedChoices.pageCount}
           buildHref={buildChoicesHref}
         />
       </section>

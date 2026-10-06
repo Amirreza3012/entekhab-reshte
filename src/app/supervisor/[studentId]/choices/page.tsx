@@ -1,22 +1,24 @@
+import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/session";
 import { Role } from "@/generated/prisma/client";
-import { getMenteeOrThrow } from "@/lib/mentor";
+import { getUserById } from "@/lib/admin";
 import { getStudentChoices } from "@/lib/choices";
 import { AllChoicesView } from "@/components/AllChoicesView";
 import {
-  removeChoiceForStudentAction,
-  reorderChoicesForStudentAction,
-} from "@/app/mentor/actions";
+  removeChoiceForAdminAction,
+  reorderChoicesForAdminAction,
+} from "@/app/admin/actions";
 
-export default async function MentorStudentAllChoicesPage({
+export default async function SupervisorStudentAllChoicesPage({
   params,
 }: {
   params: Promise<{ studentId: string }>;
 }) {
-  const mentor = await requireRole(Role.MENTOR);
+  await requireRole(Role.SUPERVISOR);
   const { studentId } = await params;
 
-  const student = await getMenteeOrThrow(mentor.id, studentId);
+  const student = await getUserById(studentId);
+  if (!student || student.role !== Role.STUDENT) notFound();
   const choices = await getStudentChoices(studentId);
 
   return (
@@ -25,8 +27,8 @@ export default async function MentorStudentAllChoicesPage({
       studentName={student.name}
       studentId={studentId}
       choices={choices}
-      reorderAction={reorderChoicesForStudentAction}
-      removeAction={removeChoiceForStudentAction}
+      reorderAction={reorderChoicesForAdminAction}
+      removeAction={removeChoiceForAdminAction}
       extraHiddenFields={{ studentId }}
     />
   );

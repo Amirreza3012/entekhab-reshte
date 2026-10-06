@@ -4,8 +4,11 @@ import { Role } from "@/generated/prisma/client";
 import { getUserById } from "@/lib/admin";
 import { getStudentChoices, MAX_CHOICES } from "@/lib/choices";
 import { BackLink } from "@/components/BackLink";
+import { choicesPageHref, paginateChoices } from "@/lib/choicePaging";
 import { ChoiceList } from "@/components/ChoiceList";
+import { Pagination } from "@/components/Pagination";
 import { PdfExportButton } from "@/components/PdfExportButton";
+import { ViewAllChoicesLink } from "@/components/ViewAllChoicesLink";
 import { StudentMajorSearch } from "@/components/StudentMajorSearch";
 import { ChoiceHistory } from "@/components/ChoiceHistory";
 import {
@@ -31,6 +34,8 @@ export default async function SupervisorStudentActivityPage({
   if (!student || student.role !== Role.STUDENT) notFound();
 
   const choices = await getStudentChoices(studentId);
+  const paged = paginateChoices(choices, sp.choicesPage);
+  const basePath = `/supervisor/${studentId}`;
 
   return (
     <div className="flex flex-col gap-4">
@@ -48,27 +53,36 @@ export default async function SupervisorStudentActivityPage({
             {toPersianDigits(choices.length)}/{toPersianDigits(MAX_CHOICES)}
           </p>
         </div>
-        <PdfExportButton
-          studentName={student.name}
-          choices={choices}
-          fileName={`انتخاب-های-${student.name}.pdf`}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <PdfExportButton
+            studentName={student.name}
+            choices={choices}
+            fileName={`انتخاب-های-${student.name}.pdf`}
+          />
+          <ViewAllChoicesLink href={`${basePath}/choices`} />
+        </div>
       </div>
 
       <div className="min-w-0 w-full">
         <div className="min-w-0 flex-1">
           <ChoiceList
-            choices={choices}
+            choices={paged.items}
+            allChoices={choices}
             studentId={studentId}
             reorderAction={reorderChoicesForAdminAction}
             removeAction={removeChoiceForAdminAction}
             extraHiddenFields={{ studentId }}
           />
+          <Pagination
+            page={paged.page}
+            pageCount={paged.pageCount}
+            buildHref={(page) => choicesPageHref(basePath, sp, page)}
+          />
         </div>
       </div>
 
       <StudentMajorSearch
-        basePath={`/supervisor/${studentId}`}
+        basePath={basePath}
         studentId={studentId}
         searchParams={sp}
         choices={choices}
